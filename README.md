@@ -19,4 +19,4 @@
 - **Node.js** – backend REST API
 - **Express.js** – framework backend untuk routing dan middleware
 - **PostgreSQL** – sebagai database relasional
-- **Sequelize ORM** – untuk mengelola database MySQL secara efisien tanpa query SQL mentah
+- **Sequelize ORM** – untuk mengelola database PostgreSQL secara efisien tanpa query SQL mentah
