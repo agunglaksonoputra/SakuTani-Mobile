@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/sale_transaction.dart';
 import '../models/sales_summary.dart';
-import '../models/sales_response.dart'; // pastikan file ini ada
 import '../services/sales_services.dart';
 
 class SalesProvider extends ChangeNotifier {
@@ -17,7 +16,7 @@ class SalesProvider extends ChangeNotifier {
   DateTimeRange? _selectedDateRange;
 
   // Getters
-  List<SaleTransaction> get transactions => _transactions.where((t) => !t.isDeleted).toList();
+  List<SaleTransaction> get transactions => _transactions.where((t) => t.isDeleted == false).toList();
   List<SaleTransaction> get filteredTransactions {
     if (_selectedDateRange == null) return transactions;
     return transactions.where((tx) {
@@ -53,6 +52,7 @@ class SalesProvider extends ChangeNotifier {
         totalWeight: response.totalWeightKg,
         totalTransactions: response.sales.length,
       );
+      print("data berhasil diambil");
     } catch (e) {
       print("❌ Gagal ambil data awal: $e");
     }

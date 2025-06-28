@@ -1,9 +1,10 @@
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import '../models/sale_transaction.dart';
 import '../models/sales_response.dart';
 
-
+final String baseUrl = dotenv.env['BASE_URL_EMULATOR'] ?? dotenv.env['BASE_URL_DEVICE'] ?? '';
 
 class SalesService {
   static Future<SalesResponse> fetchSales({
@@ -60,6 +61,34 @@ class SalesService {
         // Fallback jika response bukan JSON
         throw Exception('Gagal menghapus transaksi: ${response.body}');
       }
+    }
+  }
+
+  static Future<bool> createSalesTransaction(SaleTransaction transaction) async {
+    final uri = Uri.parse('$baseUrl/sales/');
+
+    final response = await http.post(
+      uri,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode(transaction.toJson()),
+    );
+
+    if (response.statusCode == 201) {
+      return true;
+    } else {
+      print("Failed to create sales transaction. Status code: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      try {
+        final error = json.decode(response.body);
+        print('Error message: ${error['message']}');
+      } catch (_) {
+        print('Unable to parse error response.');
+      }
+
+      return false;
     }
   }
 }
