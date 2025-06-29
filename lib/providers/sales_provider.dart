@@ -52,9 +52,8 @@ class SalesProvider extends ChangeNotifier {
         totalWeight: response.totalWeightKg,
         totalTransactions: response.sales.length,
       );
-      print("data berhasil diambil");
     } catch (e) {
-      print("❌ Gagal ambil data awal: $e");
+      print("Gagal ambil data awal: $e");
     }
 
     _isLoading = false;
@@ -78,14 +77,8 @@ class SalesProvider extends ChangeNotifier {
       _transactions.addAll(response.sales);
       _hasMore = response.sales.length >= _limit;
 
-      // update summary total juga kalau ingin akurat
-      _summary = SalesSummary(
-        totalSales: response.totalPrice.toDouble(),
-        totalWeight: response.totalWeightKg,
-        totalTransactions: _transactions.length,
-      );
     } catch (e) {
-      print("❌ Gagal load more data: $e");
+      print("Gagal load more data: $e");
       _page--;
     }
 
@@ -102,7 +95,7 @@ class SalesProvider extends ChangeNotifier {
       // await SalesService.addSale(transaction);
       await fetchInitialData();
     } catch (e) {
-      print("❌ Gagal menambahkan transaksi: $e");
+      print("Gagal menambahkan transaksi: $e");
     }
 
     _isLoading = false;
@@ -117,7 +110,7 @@ class SalesProvider extends ChangeNotifier {
       // await SalesService.updateSale(id, updatedTransaction);
       await fetchInitialData();
     } catch (e) {
-      print("❌ Gagal mengupdate transaksi: $e");
+      print("Gagal mengupdate transaksi: $e");
     }
 
     _isLoading = false;
@@ -132,7 +125,7 @@ class SalesProvider extends ChangeNotifier {
       await SalesService.softDeleteSaleTransaction(id);
       await fetchInitialData();
     } catch (e) {
-      print("❌ Gagal menghapus transaksi: $e");
+      print("Gagal menghapus transaksi: $e");
     }
 
     _isLoading = false;
