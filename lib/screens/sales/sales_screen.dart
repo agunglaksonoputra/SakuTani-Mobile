@@ -33,7 +33,7 @@ class _SalesScreenState extends State<SalesScreen> {
       });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SalesProvider>(context, listen: false).fetchInitialData();
+      Provider.of<SalesProvider>(context, listen: false).refreshData();
     });
   }
 
@@ -88,7 +88,7 @@ class _SalesScreenState extends State<SalesScreen> {
                           ),
                         ).then((_) {
                           // Setelah halaman input ditutup, panggil refresh
-                          Provider.of<SalesProvider>(context, listen: false).fetchInitialData();
+                          Provider.of<SalesProvider>(context, listen: false).refreshData();
                         });
                       },
                       child: Container(

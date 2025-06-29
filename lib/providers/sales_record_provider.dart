@@ -52,7 +52,7 @@ class SalesRecordProvider with ChangeNotifier {
         totalWeightKg: double.parse(totalWeightPerKgController.text),
         pricePerUnit: double.parse(pricePerUnitController.text),
         totalPrice: double.parse(totalPriceController.text),
-        notes: noteController.text
+        notes: noteController.text.isEmpty ? null : noteController.text,
       );
 
       final success = await SalesService.createSalesTransaction(SalesRecord);
