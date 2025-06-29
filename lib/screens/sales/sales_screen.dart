@@ -123,54 +123,61 @@ class _SalesScreenState extends State<SalesScreen> {
 
             final data = provider.filteredTransactions;
 
-            return ListView.builder(
+            return ListView(
               controller: _scrollController,
               padding: EdgeInsets.all(16),
-              itemCount: data.length + 6 + (provider.hasMore ? 1 : 0),
-              itemBuilder: (context, index) {
-                if (index == 0) return PeriodSelector();
-                if (index == 1) return SizedBox(height: 20);
-                if (index == 2) return SummaryCards();
-                if (index == 3) return SizedBox(height: 24);
-                if (index == 4) {
-                  return Text(
-                    'Daftar Transaksi',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                  );
-                }
-                if (index == 5) return SizedBox(height: 12);
-
-                final transactionIndex = index - 6;
-                if (transactionIndex < data.length) {
-                  final transaction = data[transactionIndex];
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12.0),
-                    child: TransactionItem(
-                      transaction: transaction,
-                      onDelete: () {
-                        _showDeleteDialog(context, transaction.id!);
-                      },
+              children: [
+                PeriodSelector(),
+                SizedBox(height: 20),
+                Row(
+                  children: [
+                    Expanded(
+                      child: SummaryCard(
+                        title: 'Total Penjualan',
+                        value: provider.formatCurrency(provider.summary.totalSales),
+                        color: Color(0xFF10B981),
+                        textColor: Colors.white,
+                      ),
                     ),
-                  );
-                }
-
-                if (provider.isLoadingMore) {
-                  return Padding(
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SummaryCard(
+                        title: 'Total Berat',
+                        value: '${provider.summary.totalWeight.toInt()} Kg',
+                        color: Color(0xFF8B5CF6),
+                        textColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 24),
+                Text(
+                  'Daftar Transaksi',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 12),
+                ...data.map((transaction) => Padding(
+                  padding: const EdgeInsets.only(bottom: 12.0),
+                  child: TransactionItem(
+                    transaction: transaction,
+                    onDelete: () {
+                      _showDeleteDialog(context, transaction.id!);
+                    },
+                  ),
+                )),
+                if (provider.isLoadingMore)
+                  Padding(
                     padding: const EdgeInsets.symmetric(vertical: 24),
                     child: Center(child: CircularProgressIndicator()),
-                  );
-                }
-
-                if (!provider.hasMore) {
-                  return Padding(
+                  ),
+                if (!provider.hasMore && data.isNotEmpty)
+                  Padding(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     child: Center(child: Text("Semua data telah dimuat.")),
-                  );
-                }
-
-                return SizedBox();
-              },
+                  ),
+              ],
             );
+
           },
         ),
       ),
