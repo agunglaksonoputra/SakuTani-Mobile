@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../providers/finance_provider.dart';
+import '../models/finance.dart';
 
 class FinanceCard extends StatelessWidget {
   final FinanceData data;
@@ -33,6 +33,7 @@ class FinanceCard extends StatelessWidget {
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
               fontSize: 14.0,
+              fontWeight: FontWeight.w500
             ),
           ),
         ],
@@ -41,11 +42,9 @@ class FinanceCard extends StatelessWidget {
   }
 
   String _formatNumber(double number) {
-    if (number >= 1000000) {
-      return '${(number / 1000000).toStringAsFixed(number % 1000000 == 0 ? 0 : 3)}M';
-    } else if (number >= 1000) {
-      return '${(number / 1000).toStringAsFixed(number % 1000 == 0 ? 0 : 0)}K';
-    }
-    return number.toStringAsFixed(0);
+    return number.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]}.',
+    );
   }
 }

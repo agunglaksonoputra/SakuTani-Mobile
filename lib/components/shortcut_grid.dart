@@ -1,31 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:provider/provider.dart';
+import 'package:saku_tani_mobile/providers/finance_provider.dart';
+
 import '../screens/sales/sales_screen.dart';
+import '../providers/sales_provider.dart';
+// import '../screens/expenses/expenses_screen.dart';
+// import '../screens/sharing/sharing_screen.dart';
+// import '../screens/report/report_screen.dart';
 
 class ShortcutGrid extends StatelessWidget {
   final List<Map<String, dynamic>> shortcuts = [
     {
       'icon': FontAwesomeIcons.fileCirclePlus,
       'label': 'Penjualan',
-      'color': Colors.purple,
+      'color': Color(0xFF8B5CF6),
       'route': 'sales',
     },
     {
       'icon': FontAwesomeIcons.fileCircleMinus,
       'label': 'Biaya',
-      'color': Colors.red,
+      'color': Color(0xFFF43F5E),
       'route': 'expenses',
     },
     {
       'icon': FontAwesomeIcons.chartPie,
       'label': 'Bagi Hasil',
-      'color': Colors.green,
+      'color': Color(0xFF10B981),
       'route': 'sharing',
     },
     {
       'icon': FontAwesomeIcons.chartSimple,
       'label': 'Laporan',
-      'color': Colors.blue,
+      'color': Color(0xFF8B5CF6),
       'route': 'report',
     },
   ];
@@ -38,24 +45,29 @@ class ShortcutGrid extends StatelessWidget {
         return InkWell(
           borderRadius: BorderRadius.circular(12.0),
           onTap: () {
-            // Navigasi berdasarkan route atau langsung ke widget
             if (shortcut['route'] == 'sales') {
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => SalesScreen(),
                 ),
-              );
+              ).then((_) {
+                Provider.of<FinanceProvider>(context, listen: false).refreshAll();
+              });
             } else if (shortcut['route'] == 'expenses') {
               // Navigator.push(
               //   context,
               //   MaterialPageRoute(builder: (_) => ExpensesScreen()),
-              // );
+              // ).then((_) {
+              //   Provider.of<ExpensesProvider>(context, listen: false).fetchInitialData();
+              // });
             } else if (shortcut['route'] == 'sharing') {
               // Navigator.push(
               //   context,
-              //   MaterialPageRoute(builder: (_) => ProfitSharingScreen()),
-              // );
+              //   MaterialPageRoute(builder: (_) => SharingScreen()),
+              // ).then((_) {
+              //   Provider.of<SharingProvider>(context, listen: false).fetchInitialData();
+              // });
             } else if (shortcut['route'] == 'report') {
               // Navigator.push(
               //   context,
