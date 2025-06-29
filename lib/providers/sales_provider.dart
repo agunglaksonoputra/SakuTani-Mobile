@@ -62,7 +62,8 @@ class SalesProvider extends ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    await fetchInitialData();
+    fetchInitialData();
+    loadMoreData();
   }
 
   Future<void> loadMoreData() async {
