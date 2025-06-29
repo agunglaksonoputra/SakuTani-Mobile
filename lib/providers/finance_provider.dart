@@ -1,121 +1,136 @@
 import 'package:flutter/material.dart';
-
-class FinanceData {
-  final String title;
-  final double amount;
-  final Color color;
-
-  FinanceData({
-    required this.title,
-    required this.amount,
-    required this.color,
-  });
-}
-
-class ProfitShareData {
-  final String name;
-  final String status;
-  final double amount;
-  final String date;
-
-  ProfitShareData({
-    required this.name,
-    required this.status,
-    required this.amount,
-    required this.date,
-  });
-}
-
-class CashflowData {
-  final String date;
-  final double income;
-  final double expense;
-
-  CashflowData({
-    required this.date,
-    required this.income,
-    required this.expense,
-  });
-}
+import 'package:intl/intl.dart';
+import '../models/finance.dart';
+import '../services/finance_services.dart';
 
 class FinanceProvider with ChangeNotifier {
-  List<FinanceData> _financeCards = [
-    FinanceData(
-      title: 'Saldo Usaha',
-      amount: 1000000,
-      color: Color(0xFF4CAF50),
-    ),
-    FinanceData(
-      title: 'Profit Bulan Ini',
-      amount: 1000000,
-      color: Color(0xFF4CAF50),
-    ),
-    FinanceData(
-      title: 'Pendapatan',
-      amount: 3500000,
-      color: Color(0xFF9C27B0),
-    ),
-    FinanceData(
-      title: 'Pengeluaran',
-      amount: 1500000,
-      color: Color(0xFFE91E63),
-    ),
-  ];
-
-  List<ProfitShareData> _profitShares = [
-    ProfitShareData(
-      name: 'Joko',
-      status: 'Bagi Hasil Tersedia',
-      amount: 264973,
-      date: '1 Juni 2025',
-    ),
-    ProfitShareData(
-      name: 'Pardi',
-      status: 'Bagi Hasil Tersedia',
-      amount: 264973,
-      date: '1 Juni 2025',
-    ),
-    ProfitShareData(
-      name: 'Zakat',
-      status: 'Bagi Hasil Tersedia',
-      amount: 857082,
-      date: '1 Juni 2025',
-    ),
-  ];
-
-  List<CashflowData> _cashflowData = [
-    CashflowData(date: '1 May', income: 250000, expense: 100000),
-    CashflowData(date: '2 May', income: 300000, expense: 150000),
-    CashflowData(date: '3 May', income: 280000, expense: 120000),
-    CashflowData(date: '4 May', income: 320000, expense: 180000),
-    CashflowData(date: '5 May', income: 400000, expense: 200000),
-    CashflowData(date: '6 May', income: 350000, expense: 170000),
-    CashflowData(date: '7 May', income: 300000, expense: 140000),
-    // Add more data points...
-  ];
-
-  Map<String, List<Map<String, dynamic>>> _monthlyData = {
-    'Pendapatan Bulan Ini': [
-      {'name': 'Kangkung', 'amount': 200000},
-      {'name': 'Bayam', 'amount': 200000},
-      {'name': 'Selada', 'amount': 200000},
-      {'name': 'Pokcoy', 'amount': 200000},
-    ],
-    'Pengeluaran Bulan Ini': [
-      {'name': 'Nutrisi & Pupuk', 'amount': 200000},
-      {'name': 'Bayam', 'amount': 200000},
-      {'name': 'Selada', 'amount': 200000},
-      {'name': 'Pokcoy', 'amount': 200000},
-    ],
-  };
+  List<FinanceData> _financeCards = [];
+  List<ProfitShareData> _profitShares = [];
+  List<WeeklySummary> _weeklyBreakdown = [];
+  Map<String, List<Map<String, dynamic>>> _monthlyData = {};
+  bool _isLoading = false;
 
   List<FinanceData> get financeCards => _financeCards;
   List<ProfitShareData> get profitShares => _profitShares;
-  List<CashflowData> get cashflowData => _cashflowData;
+  List<WeeklySummary> get weeklyBreakdown => _weeklyBreakdown;
   Map<String, List<Map<String, dynamic>>> get monthlyData => _monthlyData;
+  bool get isLoading => _isLoading;
 
-  void updateFinanceData() {
-    // Update logic here
+  FinanceProvider() {
+    refreshAll();// agar lebih deskriptif
+  }
+
+  String formatDateString(String? isoDateString, {String locale = 'en_US'}) {
+    if (isoDateString == null) return '';
+    final parsedDate = DateTime.tryParse(isoDateString);
+    if (parsedDate == null) return '';
+    return DateFormat('d MMMM yyyy', locale).format(parsedDate);
+  }
+
+  /// Ambil data ringkasan keuangan bulan ini (profit, sales, expenses)
+  Future<void> fetchFinanceSummary() async {
+    _isLoading = true;
+    try {
+      final data = await FinanceService.getCurrentMonthSummary();
+
+      _financeCards = [
+        FinanceData(
+          title: 'Total Saldo',
+          amount: data['total_balance']?.toDouble() ?? 0,
+          color: const Color(0xFF10B981),
+        ),
+        FinanceData(
+          title: 'Profit Bulan Ini',
+          amount: data['profit']?.toDouble() ?? 0,
+          color: const Color(0xFF10B981),
+        ),
+        FinanceData(
+          title: 'Pendapatan',
+          amount: data['total_sales']?.toDouble() ?? 0,
+          color: const Color(0xFF8B5CF6),
+        ),
+        FinanceData(
+          title: 'Pengeluaran',
+          amount: data['total_expenses']?.toDouble() ?? 0,
+          color: const Color(0xFFF43F5E),
+        ),
+      ];
+      print("Summary dipanggil");
+      notifyListeners();
+    } catch (e) {
+      print("fetchFinanceSummary error: $e");
+    }
+    _isLoading = false;
+  }
+
+  /// Ambil saldo profit share untuk masing-masing user
+  Future<void> fetchProfitShares() async {
+    print("Profit dipanggil");
+    try {
+      final data = await FinanceService.getUserBalances();
+
+      _profitShares = data.map((item) {
+        return ProfitShareData(
+          name: item['user_name'],
+          amount: double.tryParse(item['balance'].toString()) ?? 0,
+          date: formatDateString("2025-06-28", locale: 'id_ID')
+        );
+      }).toList().cast<ProfitShareData>();
+
+      notifyListeners();
+      print("Profit dipanggil");
+    } catch (e) {
+      print("fetchProfitShares error: $e");
+    }
+  }
+
+  List<CashflowData> get cashflowData => _weeklyBreakdown
+      .map((week) => CashflowData(
+    income: week.totalSales,
+    expense: week.totalExpenses,
+    label: DateFormat('d MMM').format(DateTime.parse(week.weekEnd)),
+  ))
+      .toList();
+
+  Future<void> fetchWeeklyBreakdown() async {
+    try {
+      _weeklyBreakdown = await FinanceService.getWeeklyBreakdown();
+      notifyListeners();
+    } catch (e) {
+      print("fetchWeeklyBreakdown error: $e");
+    }
+  }
+
+  Future<void> generateCurrentMonthProfit() async {
+    try {
+      final now = DateTime.now();
+      final formattedMonth = DateFormat('yyyy-MM').format(now);
+
+      await FinanceService.generateProfit(formattedMonth);
+      print("Profit berhasil digenerate untuk bulan: $formattedMonth");
+    } catch (e) {
+      print("generateCurrentMonthProfit error: $e");
+    }
+  }
+
+
+  /// Untuk me-refresh semua data (jika diperlukan)
+  Future<void> refreshAll() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await generateCurrentMonthProfit();
+      await Future.wait([
+        fetchFinanceSummary(),
+        fetchProfitShares(),
+        fetchWeeklyBreakdown(),
+      ]);
+    } catch (e) {
+      print("refreshAll error: $e");
+    }
+
+    _isLoading = false;
     notifyListeners();
   }
 }

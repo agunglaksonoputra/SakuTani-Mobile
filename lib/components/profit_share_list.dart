@@ -7,6 +7,7 @@ class ProfitShareList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<FinanceProvider>(
       builder: (context, provider, child) {
+        print("Jumlah profit shares: ${provider.profitShares.length}");
         return Column(
           children: provider.profitShares.map((share) {
             return Container(
@@ -34,7 +35,7 @@ class ProfitShareList extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            share.status,
+                           'Saldo Tersedia',
                             style: TextStyle(
                               fontSize: 12.0,
                               color: Colors.grey.shade600,

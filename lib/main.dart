@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 import 'providers/finance_provider.dart';
@@ -9,6 +10,7 @@ import 'screens/main_screen.dart'; // ⬅️ Import MainScreen yang dipisah
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id_ID', null);
   await dotenv.load(fileName: ".env");
   runApp(const MainApp());
 }
