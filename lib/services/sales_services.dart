@@ -1,10 +1,7 @@
 import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
 import '../models/sale_transaction.dart';
 import '../models/sales_response.dart';
-
-final String baseUrl = dotenv.env['BASE_URL_EMULATOR'] ?? dotenv.env['BASE_URL_DEVICE'] ?? '';
+import 'dio_client.dart';
 
 class SalesService {
   static Future<SalesResponse> fetchSales({
@@ -13,6 +10,8 @@ class SalesService {
     DateTime? startDate,
     DateTime? endDate,
   }) async {
+    final dio = DioClient.dio;
+
     final queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
@@ -20,74 +19,71 @@ class SalesService {
       if (endDate != null) 'endDate': endDate.toIso8601String().split('T').first,
     };
 
-    final uri = Uri.parse('$baseUrl/sales?').replace(queryParameters: queryParams);
+    try {
+      final response = await dio.get(
+        '/sales',
+        queryParameters: queryParams,
+      );
 
-    final response = await http.get(uri);
-
-    if (response.statusCode == 200) {
-      final jsonBody = json.decode(response.body);
-
-      final List<SaleTransaction> sales = (jsonBody['data'] as List)
+      final data = response.data;
+      final List<SaleTransaction> sales = (data['data'] as List)
           .map((e) => SaleTransaction.fromJson(e))
           .toList();
 
-      final int totalPrice = jsonBody['total_price'] ?? 0;
-      final double totalWeightKg = (jsonBody['total_weight_kg'] ?? 0).toDouble();
+      final int totalPrice = data['total_price'] ?? 0;
+      final double totalWeightKg = (data['total_weight_kg'] ?? 0).toDouble();
 
       return SalesResponse(
         sales: sales,
         totalPrice: totalPrice,
         totalWeightKg: totalWeightKg,
       );
-    } else {
-      throw Exception('Gagal mengambil data sales (Status ${response.statusCode})');
+    } catch (e) {
+      throw Exception('Gagal mengambil data sales: $e');
     }
   }
 
   static Future<void> softDeleteSaleTransaction(int id) async {
-    final uri = Uri.parse('$baseUrl/sales/soft-delete/$id');
+    final dio = DioClient.dio;
 
-    final response = await http.put(uri);
+    try {
+      final response = await dio.put('/sales/soft-delete/$id');
 
-    if (response.statusCode != 200) {
-      // Coba print dulu untuk debugging
-      print("Response body: ${response.body}");
-
-      // Cek apakah response body bisa didecode jadi JSON
-      try {
-        final error = json.decode(response.body);
-        throw Exception('Gagal menghapus transaksi: ${error['message']}');
-      } catch (e) {
-        // Fallback jika response bukan JSON
-        throw Exception('Gagal menghapus transaksi: ${response.body}');
+      if (response.statusCode != 200) {
+        final data = response.data;
+        throw Exception('Gagal menghapus transaksi: ${data['message'] ?? 'Unknown error'}');
       }
+    } catch (e) {
+      throw Exception('Gagal menghapus transaksi: $e');
     }
   }
 
   static Future<bool> createSalesTransaction(SaleTransaction transaction) async {
-    final uri = Uri.parse('$baseUrl/sales/');
+    final dio = DioClient.dio;
 
-    final response = await http.post(
-      uri,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: json.encode(transaction.toJson()),
-    );
+    try {
+      final response = await dio.post(
+        '/sales/',
+        data: jsonEncode(transaction.toJson()),
+      );
 
-    if (response.statusCode == 201) {
-      return true;
-    } else {
-      print("Failed to create sales transaction. Status code: ${response.statusCode}");
-      print("Response body: ${response.body}");
+      if (response.statusCode == 201) {
+        return true;
+      } else {
+        print("Failed to create sales transaction. Status code: ${response.statusCode}");
+        print("Response body: ${response.data}");
 
-      try {
-        final error = json.decode(response.body);
-        print('Error message: ${error['message']}');
-      } catch (_) {
-        print('Unable to parse error response.');
+        try {
+          final error = response.data;
+          print('Error message: ${error['message']}');
+        } catch (_) {
+          print('Unable to parse error response.');
+        }
+
+        return false;
       }
-
+    } catch (e) {
+      print('Exception saat createSalesTransaction: $e');
       return false;
     }
   }

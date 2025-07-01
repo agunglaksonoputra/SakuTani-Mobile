@@ -2,16 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
+import 'package:saku_tani_mobile/providers/auth_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
+import 'package:saku_tani_mobile/screens/splash_screen.dart';
+import 'package:saku_tani_mobile/services/dio_client.dart';
 import 'providers/finance_provider.dart';
 import 'providers/sales_provider.dart';
 import 'routes/app_routes.dart';
-import 'screens/main_screen.dart'; // ⬅️ Import MainScreen yang dipisah
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await initializeDateFormatting('id_ID', null);
   await dotenv.load(fileName: ".env");
+  await DioClient.initialize();
+  await initializeDateFormatting('id_ID', null);
   runApp(const MainApp());
 }
 
@@ -25,15 +28,17 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FinanceProvider()),
         ChangeNotifierProvider(create: (_) => SalesProvider()),
         ChangeNotifierProvider(create: (_) => SalesRecordProvider()),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: MaterialApp(
+        navigatorKey: DioClient.navigatorKey,
         title: 'Saku Tani',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           primarySwatch: Colors.green,
           fontFamily: 'Roboto',
         ),
-        home: MainScreen(), // ⬅️ Entry point UI-nya
+        initialRoute: '/', // Use actual Widget instead of String
         routes: AppRoutes.routes,
       ),
     );
