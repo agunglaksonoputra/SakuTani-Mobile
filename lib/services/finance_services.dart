@@ -1,83 +1,61 @@
-import 'dart:convert';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-
 import '../models/finance.dart';
-
-final String baseUrl = dotenv.env['BASE_URL_EMULATOR'] ?? dotenv.env['BASE_URL_DEVICE'] ?? '';
+import 'dio_client.dart';
 
 class FinanceService {
-
+  /// Ringkasan bulan ini (income, expense, balance)
   static Future<Map<String, dynamic>> getCurrentMonthSummary() async {
-    final res = await http.get(Uri.parse('$baseUrl/summary/current-month'));
-    if (res.statusCode == 200) {
-      return json.decode(res.body);
-    } else {
-      throw Exception('Failed to fetch finance summary');
+    try {
+      final res = await DioClient.dio.get('/summary/current-month');
+      return res.data;
+    } catch (e) {
+      throw Exception('Failed to fetch finance summary: $e');
     }
   }
 
+  /// List pembagian keuntungan
   static Future<List<dynamic>> getProfitShares() async {
-    final res = await http.get(Uri.parse('$baseUrl/profit-shares'));
-    if (res.statusCode == 200) {
-      return json.decode(res.body);
-    } else {
-      throw Exception('Failed to fetch profit shares');
+    try {
+      final res = await DioClient.dio.get('/profit-shares');
+      return res.data;
+    } catch (e) {
+      throw Exception('Failed to fetch profit shares: $e');
     }
   }
 
+  /// Saldo user per user
   static Future<List<dynamic>> getUserBalances() async {
-    final res = await http.get(Uri.parse('$baseUrl/user-balance'));
-    if (res.statusCode == 200) {
-      return json.decode(res.body);
-    } else {
-      throw Exception('Failed to fetch user balances');
+    try {
+      final res = await DioClient.dio.get('/user-balance');
+      return res.data;
+    } catch (e) {
+      throw Exception('Failed to fetch user balances: $e');
     }
   }
 
-  // static Future<List<dynamic>> getCashflow() async {
-  //   final res = await http.get(Uri.parse('$baseUrl/cashflow'));
-  //   if (res.statusCode == 200) {
-  //     return json.decode(res.body);
-  //   } else {
-  //     throw Exception('Failed to fetch cashflow data');
-  //   }
-  // }
-
+  /// Breakdown mingguan (misal income per minggu)
   static Future<List<WeeklySummary>> getWeeklyBreakdown() async {
-    final res = await http.get(Uri.parse('$baseUrl/weekly-chart'));
-    if (res.statusCode == 200) {
-      final jsonData = jsonDecode(res.body);
-      final data = jsonData['data'];
-
-      return (data as List)
-          .map((item) => WeeklySummary.fromJson(item))
-          .toList();
-    } else {
-      throw Exception("Failed to load weekly breakdown");
+    try {
+      final res = await DioClient.dio.get('/weekly-chart');
+      final data = res.data['data'] as List;
+      return data.map((item) => WeeklySummary.fromJson(item)).toList();
+    } catch (e) {
+      throw Exception("Failed to load weekly breakdown: $e");
     }
   }
 
+  /// Trigger perhitungan dan pembagian profit
   static Future<void> generateProfit(String month) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/profit-share/generate'),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: jsonEncode({
-          'month': month,
-        }),
+      final res = await DioClient.dio.post(
+        '/profit-share/generate',
+        data: {'month': month}, // Dio otomatis jsonEncode
       );
 
-      if (response.statusCode != 200) {
-        throw Exception("Failed with status ${response.statusCode}: ${response.body}");
+      if (res.statusCode != 200) {
+        throw Exception("Failed with status ${res.statusCode}: ${res.data}");
       }
-
     } catch (e) {
       throw Exception("Failed to generate profit: $e");
     }
   }
-
-
 }

@@ -7,6 +7,7 @@ environment:
   sdk: ^3.7.0
 
 dependencies:
+  dio: ^5.8.0+1
   flutter:
     sdk: flutter
   flutter_dotenv: ^5.2.1
@@ -14,6 +15,7 @@ dependencies:
   http: ^1.4.0
   intl: ^0.20.2
   provider: ^6.1.5
+  shared_preferences: ^2.5.3
 
 dev_dependencies:
   flutter_test:
