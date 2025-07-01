@@ -196,7 +196,7 @@ class TransactionItem extends StatelessWidget {
                 _buildTableRow('Total Berat', '${transaction.formatDouble(transaction.totalWeightKg)} kg'),
                 _buildTableRow('Harga per Unit', transaction.formatCurrency(transaction.pricePerUnit)),
                 _buildTableRow('Total Harga', transaction.formatCurrency(transaction.totalPrice)),
-                _buildTableRow('Catatan', transaction.notes ?? '-'),
+                _buildTableRow('Catatan', transaction.notes ?? ''),
               ],
             ),
           ),
