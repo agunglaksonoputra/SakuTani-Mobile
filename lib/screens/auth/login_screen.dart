@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 const SnackBar(
                                     content: Text('Login berhasil')),
                               );
-                              Navigator.pushReplacementNamed(context, AppRoutes.home);
+                              Navigator.pushReplacementNamed(context, AppRoutes.main);
                             } else {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Login gagal')),

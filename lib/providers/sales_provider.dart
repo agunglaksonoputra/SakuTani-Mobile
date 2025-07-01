@@ -6,7 +6,6 @@ import '../services/sales_services.dart';
 class SalesProvider extends ChangeNotifier {
   List<SaleTransaction> _transactions = [];
   SalesSummary _summary = SalesSummary(totalSales: 0, totalWeight: 0, totalTransactions: 0);
-
   bool _isLoading = false;
   bool _isLoadingMore = false;
   int _page = 1;

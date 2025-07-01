@@ -31,6 +31,8 @@ class AuthProvider with ChangeNotifier {
     notifyListeners();
     try {
       _token = await AuthService.login(username, password);
+      usernameController.clear();
+      passwordController.clear();
       return true;
     } catch (e) {
       _token = null;
@@ -52,6 +54,9 @@ class AuthProvider with ChangeNotifier {
         passwordController.text,
         validationController.text,
       );
+      usernameController.clear();
+      passwordController.clear();
+      validationController.clear();
       return true;
     } catch (e) {
       debugPrint("Register error: $e");
