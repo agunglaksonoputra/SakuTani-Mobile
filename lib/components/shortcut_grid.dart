@@ -2,12 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/providers/finance_provider.dart';
-
+import 'package:saku_tani_mobile/routes/app_routes.dart';
 import '../screens/sales/sales_screen.dart';
-import '../providers/sales_provider.dart';
-// import '../screens/expenses/expenses_screen.dart';
-// import '../screens/sharing/sharing_screen.dart';
-// import '../screens/report/report_screen.dart';
 
 class ShortcutGrid extends StatelessWidget {
   final List<Map<String, dynamic>> shortcuts = [
@@ -55,12 +51,9 @@ class ShortcutGrid extends StatelessWidget {
                 Provider.of<FinanceProvider>(context, listen: false).refreshAll();
               });
             } else if (shortcut['route'] == 'expenses') {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (_) => ExpensesScreen()),
-              // ).then((_) {
-              //   Provider.of<ExpensesProvider>(context, listen: false).fetchInitialData();
-              // });
+              Navigator.pushNamed(context, AppRoutes.expenses).then((_) {
+                Provider.of<FinanceProvider>(context, listen: false).refreshAll();
+              });
             } else if (shortcut['route'] == 'sharing') {
               // Navigator.push(
               //   context,

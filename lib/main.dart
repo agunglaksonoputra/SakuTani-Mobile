@@ -3,6 +3,8 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/providers/auth_provider.dart';
+import 'package:saku_tani_mobile/providers/expenses_provider.dart';
+import 'package:saku_tani_mobile/providers/expenses_record_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import 'package:saku_tani_mobile/services/dio_client.dart';
@@ -29,6 +31,8 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => SalesProvider()),
         ChangeNotifierProvider(create: (_) => SalesRecordProvider()),
         ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => ExpensesProvider()),
+        ChangeNotifierProvider(create: (_) => ExpensesRecordProvider()),
       ],
       child: MaterialApp(
         navigatorKey: DioClient.navigatorKey,

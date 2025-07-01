@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/period_selector.dart';
+import 'package:saku_tani_mobile/components/expenses_transaction_item.dart';
 import 'package:saku_tani_mobile/components/summary_cards.dart';
-import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
-import 'package:saku_tani_mobile/screens/sales/sales_recording_screen.dart';
+import 'package:saku_tani_mobile/providers/expenses_provider.dart';
+import 'package:saku_tani_mobile/routes/app_routes.dart';
+import '../../components/period_selector.dart';
 
-import '../../components/transaction_item.dart';
-import '../../providers/sales_provider.dart';
 
-class SalesScreen extends StatefulWidget {
+class ExpensesScreen extends StatefulWidget {
   @override
-  _SalesScreenState createState() => _SalesScreenState();
+  _ExpensesScreenState createState() => _ExpensesScreenState();
 }
 
-class _SalesScreenState extends State<SalesScreen> {
+class _ExpensesScreenState extends State<ExpensesScreen> {
   late ScrollController _scrollController;
 
   @override
@@ -25,7 +24,7 @@ class _SalesScreenState extends State<SalesScreen> {
       ..addListener(() {
         if (_scrollController.position.pixels >=
             _scrollController.position.maxScrollExtent - 200) {
-          final provider = Provider.of<SalesProvider>(context, listen: false);
+          final provider = Provider.of<ExpensesProvider>(context, listen: false);
           if (provider.hasMore && !provider.isLoadingMore) {
             provider.loadMoreData();
           }
@@ -33,7 +32,7 @@ class _SalesScreenState extends State<SalesScreen> {
       });
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SalesProvider>(context, listen: false).refreshData();
+      Provider.of<ExpensesProvider>(context, listen: false).refreshData();
     });
   }
 
@@ -68,7 +67,7 @@ class _SalesScreenState extends State<SalesScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Penjualan',
+                          'Biaya',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -81,21 +80,16 @@ class _SalesScreenState extends State<SalesScreen> {
                     // Action button (icon add)
                     GestureDetector(
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => SalesRecordingScreen(),
-                          ),
-                        ).then((_) {
+                        Navigator.pushNamed(context, AppRoutes.expensesRecord).then((_) {
                           // Setelah halaman input ditutup, panggil refresh
-                          Provider.of<SalesProvider>(context, listen: false).refreshData();
+                          Provider.of<ExpensesProvider>(context, listen: false).refreshData();
                         });
                       },
                       child: Container(
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Color(0xFF10B981),
+                          color: Color(0xFFF43F5E),
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Icon(
@@ -112,10 +106,10 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
         ),
       ),
-
       backgroundColor: Color(0xFFF5F7FA),
+
       body: SafeArea(
-        child: Consumer<SalesProvider>(
+        child: Consumer<ExpensesProvider> (
           builder: (context, provider, _) {
             if (provider.isLoading && provider.transactions.isEmpty) {
               return Center(child: CircularProgressIndicator());
@@ -133,26 +127,13 @@ class _SalesScreenState extends State<SalesScreen> {
                   onSelect: (range) => provider.setDateFilter(range),
                 ),
                 const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SummaryCard(
-                        title: 'Total Penjualan',
-                        value: provider.formatCurrency(provider.summary.totalSales),
-                        color: Color(0xFF10B981),
-                        textColor: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SummaryCard(
-                        title: 'Total Berat',
-                        value: '${provider.summary.totalWeight.toInt()} Kg',
-                        color: Color(0xFF8B5CF6),
-                        textColor: Colors.white,
-                      ),
-                    ),
-                  ],
+                SummaryCard(
+                  title: 'Total Pengeluaran',
+                  value: provider.formatCurrency(
+                    (provider.summary['totalAmount'] ?? 0).toDouble(),
+                  ),
+                  color: Color(0xFFF43F5E),
+                  textColor: Colors.white,
                 ),
                 const SizedBox(height: 24),
                 const Text(
@@ -162,28 +143,19 @@ class _SalesScreenState extends State<SalesScreen> {
                 const SizedBox(height: 12),
                 ...data.map((transaction) => Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
-                  child: TransactionItem(
-                    transaction: transaction,
-                    onDelete: () {
-                      _showDeleteDialog(context, transaction.id!);
-                    },
+                  child: ExpensesTransactionItem(
+                      transaction: transaction,
+                      onDelete: () {
+                        _showDeleteDialog(context, transaction.id!);
+                      },
                   ),
                 )),
-                if (provider.isLoadingMore)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 24),
-                    child: Center(child: CircularProgressIndicator()),
-                  ),
-                if (!provider.hasMore && data.isNotEmpty)
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    child: Center(child: Text("Semua data telah dimuat.")),
-                  ),
               ],
             );
           },
         ),
       ),
+
     );
   }
 
@@ -200,7 +172,7 @@ class _SalesScreenState extends State<SalesScreen> {
           ),
           TextButton(
             onPressed: () {
-              Provider.of<SalesProvider>(context, listen: false)
+              Provider.of<ExpensesProvider>(context, listen: false)
                   .deleteTransaction(transactionId);
               Navigator.pop(context);
             },
@@ -213,5 +185,4 @@ class _SalesScreenState extends State<SalesScreen> {
       ),
     );
   }
-
 }

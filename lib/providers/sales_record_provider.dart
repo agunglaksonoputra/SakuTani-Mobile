@@ -69,7 +69,6 @@ class SalesRecordProvider with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
-
   }
 
   bool _validateForm() {

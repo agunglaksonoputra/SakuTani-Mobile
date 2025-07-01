@@ -1,21 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/custom_text_field.dart';
-import 'package:saku_tani_mobile/components/field_selector.dart';
-import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
+import '../../components/custom_text_field.dart';
+import '../../components/field_selector.dart';
+import '../../providers/expenses_record_provider.dart';
 
-class SalesRecordingScreen extends StatefulWidget {
-  const SalesRecordingScreen({Key? key}) : super(key: key);
+class ExpensesRecordScreen extends StatefulWidget {
+  const ExpensesRecordScreen({Key? key}) : super(key: key);
 
   @override
-  State<SalesRecordingScreen> createState() => _SalesRecordingScreenState();
+  State<ExpensesRecordScreen> createState() => _ExpensesRecordingScreenState();
 }
 
-class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
+class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<SalesRecordProvider>(
+    return Consumer<ExpensesRecordProvider>(
       builder: (context, provider, _) {
         return Scaffold(
           appBar: PreferredSize(
@@ -36,7 +36,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                         ),
                         const SizedBox(width: 8),
                         Text(
-                          'Input Penjualan',
+                          'Input Biaya',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -51,24 +51,16 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
             ),
           ),
           backgroundColor: Color(0xFFF5F7FA),
-          body: Consumer<SalesRecordProvider>(
+          body: Consumer<ExpensesRecordProvider>(
             builder: (context, provider, child) {
               return SafeArea(
                 child: SingleChildScrollView(
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
-                      FieldSelectorInput(
-                        label: 'Pelanggan',
-                        controller: provider.customerController,
-                        options: ['Agung', 'Toni', 'Budi'],
-                        isRequired: true,
-                      ),
-                      const SizedBox(height: 20),
-                      FieldSelectorInput(
-                        label: 'Sayuran',
-                        controller: provider.vegetableController,
-                        options: ['Kangkung', 'Sawi', 'Bayam'],
+                      CustomTextField(
+                        label: 'Nama',
+                        controller: provider.nameController,
                         isRequired: true,
                       ),
                       const SizedBox(height: 20),
@@ -79,12 +71,12 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                               label: 'Jumlah (pcs)',
                               controller: provider.quantityController,
                               keyboardType: TextInputType.number,
-                              onChanged: (value) {
-                                provider.totalPriceController.text =
-                                    provider.totalPriceCount.truncate().toString();
-                                provider.totalWeightPerKgController.text =
-                                    provider.totalWeightKgCount.toStringAsFixed(2);
-                              },
+                              // onChanged: (value) {
+                              //   provider.totalPriceController.text =
+                              //       provider.totalPriceCount.truncate().toString();
+                              //   provider.totalWeightPerKgController.text =
+                              //       provider.totalWeightKgCount.toStringAsFixed(2);
+                              // },
                               isRequired: true,
                             ),
                           ),
@@ -107,22 +99,50 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                               label: 'Harga Satuan',
                               controller: provider.pricePerUnitController,
                               keyboardType: TextInputType.number,
-                              onChanged: (value) {
-                                provider.totalPriceController.text =
-                                    provider.totalPriceCount.truncate().toString();
-                              },
+                              // onChanged: (value) {
+                              //   provider.totalPriceController.text =
+                              //       provider.totalPriceCount.truncate().toString();
+                              // },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          // Expanded(
+                          //   child: CustomTextField(
+                          //     label: 'Berat per Satuan (gram)',
+                          //     controller: provider.weightPerUnitController,
+                          //     keyboardType: TextInputType.number,
+                          //     onChanged: (value) {
+                          //       provider.totalWeightPerKgController.text =
+                          //           provider.totalWeightKgCount.toStringAsFixed(1);
+                          //     },
+                          //   ),
+                          // ),
+                        ],
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CustomTextField(
+                              label: 'Harga Ongkir',
+                              controller: provider.shippingCostController,
+                              keyboardType: TextInputType.number,
+                              // onChanged: (value) {
+                              //   provider.totalPriceController.text =
+                              //       provider.totalPriceCount.truncate().toString();
+                              // },
                             ),
                           ),
                           const SizedBox(width: 12),
                           Expanded(
                             child: CustomTextField(
-                              label: 'Berat per Satuan (gram)',
-                              controller: provider.weightPerUnitController,
+                              label: 'Harga Diskon',
+                              controller: provider.discountController,
                               keyboardType: TextInputType.number,
-                              onChanged: (value) {
-                                provider.totalWeightPerKgController.text =
-                                    provider.totalWeightKgCount.toStringAsFixed(1);
-                              },
+                              // onChanged: (value) {
+                              //   provider.totalPriceController.text =
+                              //       provider.totalPriceCount.truncate().toString();
+                              // },
                             ),
                           ),
                         ],
@@ -138,19 +158,19 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                           Expanded(
                             child: CustomTextField(
                               label: 'Total Harga',
-                              controller: provider.totalPriceController,
+                              controller: provider.totalAmountController,
                               isRequired: true,
                             ),
                           ),
                           const SizedBox(width: 12),
-                          Expanded(
-                            child: CustomTextField(
-                              label: 'Jumlah (kg)',
-                              controller: provider.totalWeightPerKgController,
-                              keyboardType: TextInputType.number,
-                              isRequired: true,
-                            ),
-                          ),
+                          // Expanded(
+                          //   child: CustomTextField(
+                          //     label: 'Jumlah (kg)',
+                          //     controller: provider.totalWeightPerKgController,
+                          //     keyboardType: TextInputType.number,
+                          //     isRequired: true,
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 30),
@@ -159,7 +179,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                         height: 56,
                         child: ElevatedButton(
                           onPressed: provider.isLoading ? null : () async {
-                            final success = await provider.submitSalesRecord();
+                            final success = await provider.submitExpensesRecord();
 
                             if (success) {
                               showDialog(
@@ -175,7 +195,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                                       ),
                                       const SizedBox(height: 16),
                                       const Text(
-                                        'Data berhasil disimpan.',
+                                        'Berhasil.',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 20,

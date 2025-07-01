@@ -21,9 +21,7 @@ class AuthService {
       if (response.statusCode == 200 && data['success'] == true && token != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
-        print('[LOGIN] Token disimpan: $token');
 
-        // Refresh header dio dengan token baru
         await DioClient.initialize();
 
         return token;

@@ -1,32 +1,30 @@
 import 'package:intl/intl.dart';
 
-class SaleTransaction {
+class ExpensesTransaction {
   final int? id;
   final DateTime? date;
-  final String? customerName;
-  final String? itemName;
-  final int? quantity;
+  final String? name;
+  final double? quantity;
   final String? unit;
-  final double? weightPerUnitGram;
-  final double? totalWeightKg;
   final double? pricePerUnit;
-  final double? totalPrice;
+  final double? shippingCost;
+  final double? discount;
+  final double? totalAmount;
   final String? notes;
   final bool? isDeleted;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
-  SaleTransaction({
+  ExpensesTransaction({
     this.id,
     this.date,
-    this.customerName,
-    this.itemName,
+    this.name,
     this.quantity,
     this.unit,
-    this.weightPerUnitGram,
-    this.totalWeightKg,
     this.pricePerUnit,
-    this.totalPrice,
+    this.shippingCost,
+    this.discount,
+    this.totalAmount,
     this.notes,
     this.isDeleted,
     this.createdAt,
@@ -35,7 +33,7 @@ class SaleTransaction {
 
   String get formattedDate {
     if (date == null) return '-';
-    return DateFormat('d MMMM yyyy').format(date!);
+    return DateFormat('d MMMM yyyy', 'id_ID').format(date!);
   }
 
   String formatDouble(double? value) {
@@ -58,18 +56,17 @@ class SaleTransaction {
     return formatter.format(value ?? 0);
   }
 
-  factory SaleTransaction.fromJson(Map<String, dynamic> json) {
-    return SaleTransaction(
+  factory ExpensesTransaction.fromJson(Map<String, dynamic> json) {
+    return ExpensesTransaction(
       id: json['id'],
       date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      customerName: json['customer_name'],
-      itemName: json['item_name'],
-      quantity: json['quantity'],
+      name: json['name'],
+      quantity: double.tryParse(json['quantity']),
       unit: json['unit'],
-      weightPerUnitGram: double.tryParse(json['weight_per_unit_gram']),
-      totalWeightKg: double.tryParse(json['total_weight_kg']),
       pricePerUnit: double.tryParse(json['price_per_unit']),
-      totalPrice: double.tryParse(json['total_price']),
+      shippingCost: double.tryParse(json['shipping_cost']),
+      discount: double.tryParse(json['discount']),
+      totalAmount: double.tryParse(json['total_amount']),
       notes: json['notes'],
       isDeleted: json['is_deleted'],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
@@ -79,14 +76,13 @@ class SaleTransaction {
 
   Map<String, dynamic> toJson() {
     return {
-      'customer_name': customerName,
-      'item_name': itemName,
+      'name': name,
       'quantity': quantity,
       'unit': unit,
-      'weight_per_unit_gram': weightPerUnitGram,
-      'total_weight_kg': totalWeightKg,
       'price_per_unit': pricePerUnit,
-      'total_price': totalPrice,
+      'shipping_cost': shippingCost,
+      'discount': discount,
+      'total_amount': totalAmount,
       'notes': notes,
     };
   }

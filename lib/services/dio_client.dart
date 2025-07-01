@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:saku_tani_mobile/routes/app_routes.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 
@@ -34,7 +35,8 @@ class DioClient {
           return handler.next(options);
         },
         onError: (DioException e, handler) async {
-          if (e.response?.statusCode == 401) {
+          if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
+
             // Token expired: hapus dan arahkan ke login
             final prefs = await SharedPreferences.getInstance();
             await prefs.remove('auth_token');
@@ -44,8 +46,24 @@ class DioClient {
             // Arahkan ke login (jika navigatorKey digunakan)
             final context = navigatorKey.currentContext;
             if (context != null) {
+              await showDialog(
+                context: context,
+                barrierDismissible: false,
+                builder: (context) => AlertDialog(
+                  title: const Text('Sesi Berakhir'),
+                  content: const Text('Silakan login kembali untuk melanjutkan.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Tutup dialog
+                      },
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              );
               navigatorKey.currentState?.pushNamedAndRemoveUntil(
-                '/login',
+                AppRoutes.login,
                     (route) => false,
               );
             }
