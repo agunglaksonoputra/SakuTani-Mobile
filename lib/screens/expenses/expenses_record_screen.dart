@@ -159,6 +159,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Total Harga',
                               controller: provider.totalAmountController,
+                              keyboardType: TextInputType.number,
                               isRequired: true,
                             ),
                           ),

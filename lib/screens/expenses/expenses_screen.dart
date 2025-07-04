@@ -141,15 +141,35 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                ...data.map((transaction) => Padding(
-                  padding: const EdgeInsets.only(bottom: 12.0),
-                  child: ExpensesTransactionItem(
-                      transaction: transaction,
-                      onDelete: () {
-                        _showDeleteDialog(context, transaction.id!);
-                      },
-                  ),
-                )),
+                ...[
+                  if (data.isEmpty)
+                    Column(
+                      children: [
+                        const SizedBox(height: 40),
+                        const FaIcon(
+                          FontAwesomeIcons.fileCircleXmark,
+                          size: 50,
+                          color: Colors.grey,
+                        ),
+                        const SizedBox(height: 16),
+                        const Text(
+                          'Tidak ada transaksi',
+                          style: TextStyle(fontSize: 16, color: Colors.grey),
+                        ),
+                      ],
+                    )
+                  else
+                    ...data.map((transaction) => Padding(
+                      padding: const EdgeInsets.only(bottom: 12.0),
+                      child: ExpensesTransactionItem(
+                        transaction: transaction,
+                        onDelete: () {
+                          _showDeleteDialog(context, transaction.id!);
+                        },
+                      ),
+                    )),
+                ],
+
               ],
             );
           },
