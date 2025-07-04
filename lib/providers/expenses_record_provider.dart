@@ -34,7 +34,6 @@ class ExpensesRecordProvider with ChangeNotifier {
         name: nameController.text,
         quantity: double.parse(quantityController.text),
         unit: unitController.text,
-        // weightPerUnitGram: double.parse(weightPerUnitController.text),
         pricePerUnit: double.parse(pricePerUnitController.text),
         shippingCost: double.parse(shippingCostController.text),
         discount: double.parse(discountController.text),
