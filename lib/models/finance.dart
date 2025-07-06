@@ -15,12 +15,10 @@ class FinanceData {
 class ProfitShareData {
   final String name;
   final double amount;
-  final String date;
 
   ProfitShareData({
     required this.name,
     required this.amount,
-    required this.date,
   });
 }
 
@@ -50,9 +48,9 @@ class WeeklySummary {
 
   factory WeeklySummary.fromJson(Map<String, dynamic> json) {
     return WeeklySummary(
-      weekEnd: json['week_end'],
-      totalSales: (json['total_sales'] as num).toDouble(),
-      totalExpenses: (json['total_expenses'] as num).toDouble(),
+      weekEnd: json['date'],
+      totalSales: (json['sales_total'] as num).toDouble(),
+      totalExpenses: (json['expenses_total'] as num).toDouble(),
     );
   }
 }
