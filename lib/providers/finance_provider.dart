@@ -31,27 +31,28 @@ class FinanceProvider with ChangeNotifier {
   Future<void> fetchFinanceSummary() async {
     _isLoading = true;
     try {
-      final data = await FinanceService.getCurrentMonthSummary();
+      final response = await FinanceService.getCurrentMonthSummary();
+      final data = response['data'];
 
       _financeCards = [
         FinanceData(
           title: 'Total Saldo',
-          amount: data['total_balance']?.toDouble() ?? 0,
+          amount: data['total_user_balance']?.toDouble() ?? 0,
           color: const Color(0xFF10B981),
         ),
         FinanceData(
           title: 'Profit Bulan Ini',
-          amount: data['profit']?.toDouble() ?? 0,
+          amount: double.tryParse(data['total_profit'].toString()) ?? 0,
           color: const Color(0xFF10B981),
         ),
         FinanceData(
           title: 'Pendapatan',
-          amount: data['total_sales']?.toDouble() ?? 0,
+          amount: double.tryParse(data['total_sales'].toString()) ?? 0,
           color: const Color(0xFF8B5CF6),
         ),
         FinanceData(
           title: 'Pengeluaran',
-          amount: data['total_expenses']?.toDouble() ?? 0,
+          amount: double.tryParse(data['total_expenses'].toString()) ?? 0,
           color: const Color(0xFFF43F5E),
         ),
       ];
@@ -71,9 +72,8 @@ class FinanceProvider with ChangeNotifier {
 
       _profitShares = data.map((item) {
         return ProfitShareData(
-          name: item['user_name'],
+          name: item['name'],
           amount: double.tryParse(item['balance'].toString()) ?? 0,
-          date: formatDateString("2025-06-28", locale: 'id_ID')
         );
       }).toList().cast<ProfitShareData>();
 

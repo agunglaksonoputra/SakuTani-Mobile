@@ -5,7 +5,7 @@ class FinanceService {
   /// Ringkasan bulan ini (income, expense, balance)
   static Future<Map<String, dynamic>> getCurrentMonthSummary() async {
     try {
-      final res = await DioClient.dio.get('/summary/current-month');
+      final res = await DioClient.dio.get('report/current');
       return res.data;
     } catch (e) {
       throw Exception('Failed to fetch finance summary: $e');
@@ -35,7 +35,7 @@ class FinanceService {
   /// Breakdown mingguan (misal income per minggu)
   static Future<List<WeeklySummary>> getWeeklyBreakdown() async {
     try {
-      final res = await DioClient.dio.get('/weekly-chart');
+      final res = await DioClient.dio.get('/transactions/weekly-summary');
       final data = res.data['data'] as List;
       return data.map((item) => WeeklySummary.fromJson(item)).toList();
     } catch (e) {

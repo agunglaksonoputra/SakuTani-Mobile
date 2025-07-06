@@ -18,58 +18,34 @@ class ProfitShareList extends StatelessWidget {
                 borderRadius: BorderRadius.circular(8.0),
                 border: Border.all(color: Colors.grey.shade300),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            share.name,
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          Text(
-                           'Saldo Tersedia',
-                            style: TextStyle(
-                              fontSize: 12.0,
-                              color: Colors.grey.shade600,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        share.name,
+                        style: TextStyle(
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       Text(
-                        'Rp ${_formatNumber(share.amount)}',
+                        'Saldo Tersedia',
                         style: TextStyle(
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 12.0,
+                          color: Colors.grey.shade600,
                         ),
                       ),
                     ],
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Terakhir Diambil',
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                      Text(
-                        share.date,
-                        style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.grey.shade600,
-                        ),
-                      ),
-                    ],
+                  Text(
+                    'Rp ${_formatNumber(share.amount)}',
+                    style: TextStyle(
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
