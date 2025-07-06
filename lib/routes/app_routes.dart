@@ -4,6 +4,7 @@ import 'package:saku_tani_mobile/screens/expenses/expenses_record_screen.dart';
 import 'package:saku_tani_mobile/screens/expenses/expenses_screen.dart';
 import 'package:saku_tani_mobile/screens/main_screen.dart';
 import 'package:saku_tani_mobile/screens/sales/sales_screen.dart';
+import 'package:saku_tani_mobile/screens/shares/shares_screen.dart';
 import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import '../components/reports_screen.dart';
 import '../screens/home_screen.dart';
@@ -19,6 +20,7 @@ class AppRoutes {
   static const String sales = '/sales';
   static const String expenses = '/expenses';
   static const String expensesRecord = '/expenses/record';
+  static const String bagiHasil = '/shares';
 
   static Map<String, WidgetBuilder> routes = {
 
@@ -31,6 +33,7 @@ class AppRoutes {
     sales: (context) => SalesScreen(),
     expenses: (context) => ExpensesScreen(),
     expensesRecord: (context) => ExpensesRecordScreen(),
+    bagiHasil: (context) => SharesScreen(),
 
   };
 }

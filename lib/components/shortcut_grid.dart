@@ -55,12 +55,9 @@ class ShortcutGrid extends StatelessWidget {
                 Provider.of<FinanceProvider>(context, listen: false).refreshAll();
               });
             } else if (shortcut['route'] == 'sharing') {
-              // Navigator.push(
-              //   context,
-              //   MaterialPageRoute(builder: (_) => SharingScreen()),
-              // ).then((_) {
-              //   Provider.of<SharingProvider>(context, listen: false).fetchInitialData();
-              // });
+              Navigator.pushNamed(context, AppRoutes.bagiHasil).then((_) {
+                Provider.of<FinanceProvider>(context, listen: false).refreshAll();
+              });
             } else if (shortcut['route'] == 'report') {
               // Navigator.push(
               //   context,

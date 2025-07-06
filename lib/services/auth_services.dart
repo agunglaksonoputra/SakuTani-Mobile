@@ -9,7 +9,7 @@ class AuthService {
   /// Login user dan simpan token
   static Future<String> login(String username, String password) async {
     try {
-      final response = await DioClient.dio.post('/auth/login', data: {
+      final response = await DioClient.dio.post('/auth/login/', data: {
         'username': username,
         'password': password,
       });

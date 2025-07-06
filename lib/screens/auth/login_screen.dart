@@ -17,6 +17,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    bool _obscurePassword = true;
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
@@ -92,7 +93,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         const SizedBox(height: 8),
                         TextFormField(
                           controller: authProvider.passwordController,
-                          obscureText: true,
+                          obscureText: _obscurePassword,
+
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Color(0xFF8B5CF6).withOpacity(0.1),
@@ -113,6 +115,16 @@ class _LoginScreenState extends State<LoginScreen> {
                                 color: Color(0xFF8B5CF6),
                                 width: 2.0,
                               ),
+                            ),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _obscurePassword = !_obscurePassword;
+                                });
+                              },
                             ),
                           ),
                           validator: (value) {
