@@ -6,6 +6,7 @@ import 'package:saku_tani_mobile/providers/auth_provider.dart';
 import 'package:saku_tani_mobile/providers/expenses_provider.dart';
 import 'package:saku_tani_mobile/providers/expenses_record_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
+import 'package:saku_tani_mobile/providers/shares_provider.dart';
 import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import 'package:saku_tani_mobile/services/dio_client.dart';
 import 'providers/finance_provider.dart';
@@ -33,6 +34,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => ExpensesProvider()),
         ChangeNotifierProvider(create: (_) => ExpensesRecordProvider()),
+        ChangeNotifierProvider(create: (_) => SharesProvider()),
       ],
       child: MaterialApp(
         navigatorKey: DioClient.navigatorKey,
@@ -42,7 +44,7 @@ class MainApp extends StatelessWidget {
           primarySwatch: Colors.green,
           fontFamily: 'Roboto',
         ),
-        initialRoute: '/', // Use actual Widget instead of String
+        initialRoute: '/',
         routes: AppRoutes.routes,
       ),
     );
