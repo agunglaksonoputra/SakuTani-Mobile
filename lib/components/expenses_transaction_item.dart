@@ -158,7 +158,7 @@ class ExpensesTransactionItem extends StatelessWidget {
               children: [
                 _buildTableRow('Tanggal', transaction.formattedDate),
                 _buildTableRow('Nama', transaction.name ?? '-'),
-                _buildTableRow('Jumlah', '${transaction.quantity ?? 0} ${transaction.unit}'),
+                _buildTableRow('Jumlah', '${transaction.formatDouble(transaction.quantity)} ${transaction.unit}'),
                 _buildTableRow('Harga per Unit', transaction.formatCurrency(transaction.pricePerUnit)),
                 _buildTableRow('Ongkir', transaction.formatCurrency(transaction.shippingCost ?? 0)),
                 _buildTableRow('Diskon', transaction.formatCurrency(transaction.discount ?? 0)),
