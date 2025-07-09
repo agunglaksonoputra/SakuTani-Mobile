@@ -7,6 +7,7 @@ import 'package:saku_tani_mobile/providers/expenses_provider.dart';
 import 'package:saku_tani_mobile/providers/expenses_record_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 import 'package:saku_tani_mobile/providers/shares_provider.dart';
+import 'package:saku_tani_mobile/providers/shares_record_provider.dart';
 import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import 'package:saku_tani_mobile/services/dio_client.dart';
 import 'providers/finance_provider.dart';
@@ -16,9 +17,10 @@ import 'routes/app_routes.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env");
-  await DioClient.initialize();
   await initializeDateFormatting('id_ID', null);
   runApp(const MainApp());
+
+  await DioClient.initialize();
 }
 
 class MainApp extends StatelessWidget {
@@ -35,6 +37,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ExpensesProvider()),
         ChangeNotifierProvider(create: (_) => ExpensesRecordProvider()),
         ChangeNotifierProvider(create: (_) => SharesProvider()),
+        ChangeNotifierProvider(create: (_) => SharesRecordProvider()),
       ],
       child: MaterialApp(
         navigatorKey: DioClient.navigatorKey,

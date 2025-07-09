@@ -14,6 +14,17 @@ class ExpensesRecordScreen extends StatefulWidget {
 
 class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
   @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<ExpensesRecordProvider>(context, listen: false);
+      provider.fetchOptions();
+      provider.clearForm();
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<ExpensesRecordProvider>(
       builder: (context, provider, _) {
@@ -85,7 +96,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: FieldSelectorInput(
                               label: 'Satuan',
                               controller: provider.unitController,
-                              options: ['kg', 'pcs'],
+                              options: provider.unitOptions,
                               isRequired: true,
                             ),
                           ),

@@ -2,8 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dio_client.dart';
-
-final String baseUrl = dotenv.env['BASE_URL_EMULATOR'] ?? dotenv.env['BASE_URL_DEVICE'] ?? '';
+import 'logger_service.dart';
 
 class AuthService {
   /// Login user dan simpan token
@@ -13,7 +12,6 @@ class AuthService {
         'username': username,
         'password': password,
       });
-      print('[DEBUG] Base URL: $baseUrl');
 
       final data = response.data;
       final token = data['token'];
@@ -21,16 +19,23 @@ class AuthService {
       if (response.statusCode == 200 && data['success'] == true && token != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
-
         await DioClient.initialize();
+
+        LoggerService.info('[LOGIN] Login successful. Token stored.');
 
         return token;
       } else {
+        final message = data['message'] ?? 'Unknown error';
+        LoggerService.warning('[LOGIN] Login failed: $message');
         throw Exception("Login gagal: ${data['message'] ?? 'Unknown error'}");
       }
-    } on DioException catch (e) {
+    } on DioException catch (e, stackTrace) {
       final errorMessage = e.response?.data['message'] ?? e.message;
-      throw Exception('[ERROR] Login gagal: $errorMessage');
+      LoggerService.error('[LOGIN] DioException occurred', error: errorMessage, stackTrace: stackTrace);
+      throw Exception('[LOGIN] Login failed: $errorMessage');
+    } catch (e, stackTrace) {
+      LoggerService.error('[LOGIN] Unexpected error', error: e, stackTrace: stackTrace);
+      throw Exception('[LOGIN] Unexpected error: $e');
     }
   }
 
@@ -45,11 +50,21 @@ class AuthService {
 
       if (response.statusCode != 200) {
         final data = response.data;
+        final msg = data['message'] ?? 'Unknown error';
+
+        LoggerService.warning('[REGISTER] Registration failed: $msg');
+
         throw Exception("Register gagal: ${data['message']}");
       }
-    } on DioException catch (e) {
+
+      LoggerService.info('[REGISTER] User registered successfully.');
+    } on DioException catch (e, stackTrace) {
       final msg = e.response?.data['message'] ?? e.message;
-      throw Exception("Register error: $msg");
+      LoggerService.error('[REGISTER] DioException during registration', error: msg, stackTrace: stackTrace);
+      throw Exception("Registration error: $msg");
+    } catch (e, stackTrace) {
+      LoggerService.error('[REGISTER] Unexpected error', error: e, stackTrace: stackTrace);
+      throw Exception("Unexpected registration error: $e");
     }
   }
 
@@ -59,6 +74,7 @@ class AuthService {
     final token = prefs.getString('auth_token');
 
     if (token == null) {
+      LoggerService.warning('[TOKEN] No token found in local storage.');
       throw Exception("Tidak ada token tersimpan.");
     }
 
@@ -67,13 +83,20 @@ class AuthService {
 
       final data = response.data;
       if (response.statusCode == 200 && data['success'] == true) {
+        LoggerService.info('[TOKEN] Token verification successful.');
         return data['user'];
       } else {
+        final msg = data['message'] ?? 'Invalid token';
+        LoggerService.warning('[TOKEN] Token verification failed: $msg');
         throw Exception("Token tidak valid: ${data['message']}");
       }
-    } on DioException catch (e) {
+    } on DioException catch (e, stackTrace) {
       final msg = e.response?.data['message'] ?? e.message;
-      throw Exception("Verifikasi token gagal: $msg");
+      LoggerService.error('[TOKEN] DioException during token verification', error: msg, stackTrace: stackTrace);
+      throw Exception("Token verification error: $msg");
+    } catch (e, stackTrace) {
+      LoggerService.error('[TOKEN] Unexpected error during token verification', error: e, stackTrace: stackTrace);
+      throw Exception("Unexpected token verification error: $e");
     }
   }
 
@@ -82,6 +105,6 @@ class AuthService {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
     await DioClient.initialize();
-    print("[LOGOUT] Token dihapus");
+    LoggerService.info('[LOGOUT] Token removed from local storage.');
   }
 }

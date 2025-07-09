@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:saku_tani_mobile/models/sale_transaction.dart';
 import 'package:saku_tani_mobile/services/sales_services.dart';
+import '../services/data_master_service.dart';
+import '../services/logger_service.dart';
 
 class SalesRecordProvider with ChangeNotifier {
   bool _isLoading = false;
@@ -16,25 +19,51 @@ class SalesRecordProvider with ChangeNotifier {
   final TextEditingController totalPriceController = TextEditingController();
   final TextEditingController totalWeightPerKgController = TextEditingController();
 
+  List<String> customerOptions = [];
+  List<String> vegetableOptions = [];
+  List<String> unitOptions = [];
+
   String? get errorMessage => _errorMessage;
   bool get isLoading => _isLoading;
 
+  // Capitalize the first letter of a string
+  String _capitalize(String input) {
+    if (input.isEmpty) return input;
+    return input[0].toUpperCase() + input.substring(1);
+  }
+
+  // Format decimal numbers in Indonesian format
+  String formatDecimal(double? value) {
+    if (value == null || value == 0) return '0';
+    final formatter = NumberFormat("#,##0.##", "id");
+    return formatter.format(value);
+  }
+
+  // Convert string with dot/comma separator to double
+  double parseIndoNumber(String input) {
+    return double.tryParse(input.replaceAll('.', '').replaceAll(',', '.')) ?? 0;
+  }
+
+  // Auto-calculation: total price = quantity * price/unit
   double get totalPriceCount {
-    final quantity = double.tryParse(quantityController.text) ?? 0;
-    final price = double.tryParse(pricePerUnitController.text) ?? 0;
+    final quantity = parseIndoNumber(quantityController.text);
+    final price = parseIndoNumber(pricePerUnitController.text);
     return quantity * price;
   }
 
+  // Auto-calculation: total weight in KG = (quantity * weight/unit) / 1000
   double get totalWeightKgCount {
-    final quantity = int.tryParse(quantityController.text) ?? 0;
-    final weight = double.tryParse(weightPerUnitController.text) ?? 0;
+    final quantity = parseIndoNumber(quantityController.text);
+    final weight = parseIndoNumber(weightPerUnitController.text);
     return (quantity * weight) / 1000;
   }
 
+  /// Submit new sales transaction
   Future<bool> submitSalesRecord() async {
     if (!_validateForm()) {
-      _errorMessage = 'Field wajib diisi!';
+      _errorMessage = 'All required fields must be filled.';
       notifyListeners();
+      LoggerService.warning('[SALES] Submission failed: Validation failed.');
       return false;
     }
 
@@ -43,27 +72,32 @@ class SalesRecordProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final SalesRecord = SaleTransaction(
+      final sale = SaleTransaction(
         customerName: customerController.text,
         itemName: vegetableController.text,
-        quantity: int.parse(quantityController.text),
+        quantity: parseIndoNumber(quantityController.text),
         unit: unitController.text,
-        weightPerUnitGram: double.parse(weightPerUnitController.text),
-        totalWeightKg: double.parse(totalWeightPerKgController.text),
-        pricePerUnit: double.parse(pricePerUnitController.text),
-        totalPrice: double.parse(totalPriceController.text),
+        weightPerUnitGram: parseIndoNumber(weightPerUnitController.text),
+        totalWeightKg: parseIndoNumber(totalWeightPerKgController.text),
+        pricePerUnit: parseIndoNumber(pricePerUnitController.text),
+        totalPrice: parseIndoNumber(totalPriceController.text),
         notes: noteController.text.isEmpty ? null : noteController.text,
       );
 
-      final success = await SalesService.createSalesTransaction(SalesRecord);
+      LoggerService.info('[SALES] Sending transaction data to backend...');
+      final success = await SalesService.createSalesTransaction(sale);
 
       if (success) {
+        LoggerService.info('[SALES] Sales transaction submitted successfully.');
         clearForm();
+      } else {
+        LoggerService.warning('[SALES] Failed to submit sales transaction.');
       }
-      print('Berhasil terkirim');
+
       return success;
-    } catch (e) {
+    } catch (e, st) {
       _errorMessage = e.toString();
+      LoggerService.error('[SALES] Exception occurred while submitting transaction.', error: e, stackTrace: st);
       return false;
     } finally {
       _isLoading = false;
@@ -71,15 +105,45 @@ class SalesRecordProvider with ChangeNotifier {
     }
   }
 
-  bool _validateForm() {
-    return customerController.text.isNotEmpty &&
-      vegetableController.text.isNotEmpty &&
-      quantityController.text.isNotEmpty &&
-      unitController.text.isNotEmpty &&
-      totalPriceController.text.isNotEmpty &&
-      totalWeightPerKgController.text.isNotEmpty;
+  /// Fetch options (customer, vegetable, unit)
+  Future<void> fetchOptions() async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      LoggerService.info('[SALES] Fetching form options...');
+      final options = await DataMasterService.fetchOptions();
+
+      customerOptions = options['customers'] ?? [];
+      vegetableOptions = (options['vegetables'] ?? []).map<String>((v) => _capitalize(v)).toList();
+      unitOptions = options['units'] ?? [];
+
+      LoggerService.info('[SALES] Options fetched successfully.');
+      _errorMessage = null;
+    } catch (e, st) {
+      _errorMessage = e.toString();
+      LoggerService.error('[SALES] Failed to fetch options.', error: e, stackTrace: st);
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
   }
 
+  /// Form validation
+  bool _validateForm() {
+    final quantity = parseIndoNumber(quantityController.text);
+    final totalPrice = parseIndoNumber(totalPriceController.text);
+    final totalWeight = parseIndoNumber(totalWeightPerKgController.text);
+
+    return customerController.text.isNotEmpty &&
+        vegetableController.text.isNotEmpty &&
+        unitController.text.isNotEmpty &&
+        quantity > 0 &&
+        totalPrice > 0 &&
+        totalWeight > 0;
+  }
+
+  /// Clear all form fields
   void clearForm() {
     customerController.clear();
     vegetableController.clear();
@@ -91,6 +155,8 @@ class SalesRecordProvider with ChangeNotifier {
     totalPriceController.clear();
     totalWeightPerKgController.clear();
     notifyListeners();
+
+    LoggerService.debug('[SALES] Form cleared.');
   }
 
   @override

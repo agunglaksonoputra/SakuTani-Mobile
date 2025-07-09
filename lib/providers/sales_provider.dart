@@ -2,26 +2,28 @@ import 'package:flutter/material.dart';
 import '../models/sale_transaction.dart';
 import '../models/sales_summary.dart';
 import '../services/sales_services.dart';
+import '../services/logger_service.dart';
 
 class SalesProvider extends ChangeNotifier {
   List<SaleTransaction> _transactions = [];
   SalesSummary _summary = SalesSummary(totalSales: 0, totalWeight: 0, totalTransactions: 0);
+
   bool _isLoading = false;
   bool _isLoadingMore = false;
   int _page = 1;
   final int _limit = 10;
   bool _hasMore = true;
-
   DateTimeRange? _selectedDateRange;
 
   // Getters
-  List<SaleTransaction> get transactions => _transactions.where((t) => t.isDeleted == false).toList();
+  List<SaleTransaction> get transactions => _transactions.where((t) => t.deletedAt == null).toList();
+
   List<SaleTransaction> get filteredTransactions {
     if (_selectedDateRange == null) return transactions;
     return transactions.where((tx) {
       if (tx.date == null) return false;
-      return tx.date!.isAfter(_selectedDateRange!.start.subtract(Duration(days: 1))) &&
-          tx.date!.isBefore(_selectedDateRange!.end.add(Duration(days: 1)));
+      return tx.date!.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
+          tx.date!.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
     }).toList();
   }
 
@@ -42,7 +44,9 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
 
     try {
+      LoggerService.info('[SALES] Fetching initial sales data (page: $_page)...');
       final response = await SalesService.fetchSales(page: _page, limit: _limit);
+
       _transactions = response.sales;
       _hasMore = response.sales.length >= _limit;
 
@@ -51,8 +55,10 @@ class SalesProvider extends ChangeNotifier {
         totalWeight: response.totalWeightKg,
         totalTransactions: response.sales.length,
       );
-    } catch (e) {
-      print("Gagal ambil data awal: $e");
+
+      LoggerService.info('[SALES] Successfully fetched ${response.sales.length} records.');
+    } catch (e, st) {
+      LoggerService.error('[SALES] Failed to fetch initial sales data.', error: e, stackTrace: st);
     }
 
     _isLoading = false;
@@ -60,8 +66,10 @@ class SalesProvider extends ChangeNotifier {
   }
 
   Future<void> refreshData() async {
-    fetchInitialData();
-    loadMoreData();
+    LoggerService.debug('[SALES] Refreshing sales data...');
+    await Future.delayed(const Duration(milliseconds: 300));
+    await fetchInitialData();
+    await loadMoreData();
   }
 
   Future<void> loadMoreData() async {
@@ -72,77 +80,85 @@ class SalesProvider extends ChangeNotifier {
 
     try {
       _page++;
+      LoggerService.debug('[SALES] Loading more data (page: $_page)...');
+
       final response = await SalesService.fetchSales(page: _page, limit: _limit);
       _transactions.addAll(response.sales);
       _hasMore = response.sales.length >= _limit;
 
-    } catch (e) {
-      print("Gagal load more data: $e");
+      LoggerService.info('[SALES] Loaded ${response.sales.length} more records.');
+    } catch (e, st) {
       _page--;
+      LoggerService.error('[SALES] Failed to load more data.', error: e, stackTrace: st);
     }
 
     _isLoadingMore = false;
     notifyListeners();
   }
 
-  // Commands
-  Future<void> addTransaction(SaleTransaction transaction) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // await SalesService.addSale(transaction);
-      await fetchInitialData();
-    } catch (e) {
-      print("Gagal menambahkan transaksi: $e");
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
-
-  Future<void> updateTransaction(int id, SaleTransaction updatedTransaction) async {
-    _isLoading = true;
-    notifyListeners();
-
-    try {
-      // await SalesService.updateSale(id, updatedTransaction);
-      await fetchInitialData();
-    } catch (e) {
-      print("Gagal mengupdate transaksi: $e");
-    }
-
-    _isLoading = false;
-    notifyListeners();
-  }
+  // Future<void> addTransaction(SaleTransaction transaction) async {
+  //   _isLoading = true;
+  //   notifyListeners();
+  //
+  //   try {
+  //     LoggerService.debug('[SALES] Adding new transaction...');
+  //     // await SalesService.addSale(transaction);
+  //     await fetchInitialData();
+  //     LoggerService.info('[SALES] Transaction added successfully.');
+  //   } catch (e, st) {
+  //     LoggerService.error('[SALES] Failed to add transaction.', error: e, stackTrace: st);
+  //   }
+  //
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
+  //
+  // Future<void> updateTransaction(int id, SaleTransaction updatedTransaction) async {
+  //   _isLoading = true;
+  //   notifyListeners();
+  //
+  //   try {
+  //     LoggerService.debug('[SALES] Updating transaction ID: $id...');
+  //     // await SalesService.updateSale(id, updatedTransaction);
+  //     await fetchInitialData();
+  //     LoggerService.info('[SALES] Transaction updated successfully.');
+  //   } catch (e, st) {
+  //     LoggerService.error('[SALES] Failed to update transaction.', error: e, stackTrace: st);
+  //   }
+  //
+  //   _isLoading = false;
+  //   notifyListeners();
+  // }
 
   Future<void> deleteTransaction(int id) async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      LoggerService.debug('[SALES] Deleting transaction ID: $id...');
       await SalesService.softDeleteSaleTransaction(id);
       await fetchInitialData();
-    } catch (e) {
-      print("Gagal menghapus transaksi: $e");
+      LoggerService.info('[SALES] Transaction deleted.');
+    } catch (e, st) {
+      LoggerService.error('[SALES] Failed to delete transaction.', error: e, stackTrace: st);
     }
 
     _isLoading = false;
     notifyListeners();
   }
 
-  // Date Filter
   void setDateFilter(DateTimeRange range) {
     _selectedDateRange = range;
+    LoggerService.debug('[SALES] Filter set: ${range.start} to ${range.end}');
     notifyListeners();
   }
 
   void clearDateFilter() {
     _selectedDateRange = null;
+    LoggerService.debug('[SALES] Date filter cleared.');
     notifyListeners();
   }
 
-  // Formatter
   String formatCurrency(double amount) {
     return 'Rp ${amount.toStringAsFixed(0).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),

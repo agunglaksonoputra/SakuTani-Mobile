@@ -13,6 +13,18 @@ class SalesRecordingScreen extends StatefulWidget {
 }
 
 class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<SalesRecordProvider>(context, listen: false);
+      provider.fetchOptions();
+      provider.clearForm();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<SalesRecordProvider>(
@@ -32,7 +44,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                       children: [
                         IconButton(
                           icon: Icon(FontAwesomeIcons.angleLeft, color: Colors.black),
-                          onPressed: () => Navigator.pop(context), // Tetap bisa pakai ini
+                          onPressed: () => Navigator.pop(context),
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -61,14 +73,14 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                       FieldSelectorInput(
                         label: 'Pelanggan',
                         controller: provider.customerController,
-                        options: ['Agung', 'Toni', 'Budi'],
+                        options: provider.customerOptions,
                         isRequired: true,
                       ),
                       const SizedBox(height: 20),
                       FieldSelectorInput(
                         label: 'Sayuran',
                         controller: provider.vegetableController,
-                        options: ['Kangkung', 'Sawi', 'Bayam'],
+                        options: provider.vegetableOptions,
                         isRequired: true,
                       ),
                       const SizedBox(height: 20),
@@ -81,9 +93,9 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
                                 provider.totalPriceController.text =
-                                    provider.totalPriceCount.truncate().toString();
+                                    provider.formatDecimal(provider.totalPriceCount);
                                 provider.totalWeightPerKgController.text =
-                                    provider.totalWeightKgCount.toStringAsFixed(2);
+                                    provider.formatDecimal(provider.totalWeightKgCount);
                               },
                               isRequired: true,
                             ),
@@ -93,7 +105,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: FieldSelectorInput(
                               label: 'Satuan',
                               controller: provider.unitController,
-                              options: ['kg', 'pcs'],
+                              options: provider.unitOptions,
                               isRequired: true,
                             ),
                           ),
@@ -109,7 +121,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
                                 provider.totalPriceController.text =
-                                    provider.totalPriceCount.truncate().toString();
+                                  provider.formatDecimal(provider.totalPriceCount);
                               },
                             ),
                           ),
@@ -121,7 +133,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                               keyboardType: TextInputType.number,
                               onChanged: (value) {
                                 provider.totalWeightPerKgController.text =
-                                    provider.totalWeightKgCount.toStringAsFixed(1);
+                                  provider.formatDecimal(provider.totalWeightKgCount);
                               },
                             ),
                           ),
@@ -139,6 +151,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Total Harga',
                               controller: provider.totalPriceController,
+                              // keyboardType: TextInputType.number,
                               isRequired: true,
                             ),
                           ),

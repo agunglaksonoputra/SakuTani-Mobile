@@ -49,7 +49,7 @@ class TransactionItem extends StatelessWidget {
                     size: 20,
                   ),
                 ),
-                SizedBox(width: 12),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,9 +84,9 @@ class TransactionItem extends StatelessWidget {
                         color: Color(0xFF1A1A1A),
                       ),
                     ),
-                    SizedBox(height: 4),
+                    const SizedBox(height: 4),
                     Text(
-                      '${transaction.quantity ?? 0} ${transaction.unit}/${transaction.formatDouble(transaction.totalWeightKg)} kg',
+                      '${transaction.formatDouble(transaction.quantity) ?? 0} ${transaction.unit}/${transaction.formatDouble(transaction.totalWeightKg)} kg',
                       style: TextStyle(
                         fontSize: 12,
                         color: Color(0xFF6B7280),
@@ -95,7 +95,7 @@ class TransactionItem extends StatelessWidget {
                   ],
                 ),
                 if (onDelete != null) ...[
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
                       print('Icon delete ditekan');
@@ -127,7 +127,7 @@ class TransactionItem extends StatelessWidget {
                     size: 16,
                     color: Color(0xFF6B7280),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       transaction.itemName!,
@@ -150,7 +150,7 @@ class TransactionItem extends StatelessWidget {
                     size: 16,
                     color: Color(0xFF6B7280),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       transaction.notes!,
@@ -191,7 +191,7 @@ class TransactionItem extends StatelessWidget {
                 _buildTableRow('Tanggal', transaction.formattedDate),
                 _buildTableRow('Nama Pelanggan', transaction.customerName ?? '-'),
                 _buildTableRow('Nama Barang', transaction.itemName ?? '-'),
-                _buildTableRow('Jumlah', '${transaction.quantity ?? 0} ${transaction.unit}'),
+                _buildTableRow('Jumlah', '${transaction.formatDouble(transaction.quantity) ?? 0} ${transaction.unit}'),
                 _buildTableRow('Berat per Unit', '${transaction.formatDouble(transaction.weightPerUnitGram)} gram'),
                 _buildTableRow('Total Berat', '${transaction.formatDouble(transaction.totalWeightKg)} kg'),
                 _buildTableRow('Harga per Unit', transaction.formatCurrency(transaction.pricePerUnit)),

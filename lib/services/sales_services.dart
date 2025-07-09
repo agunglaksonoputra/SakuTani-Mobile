@@ -1,7 +1,8 @@
-import 'dart:convert';
+import 'package:dio/dio.dart';
 import '../models/sale_transaction.dart';
 import '../models/sales_response.dart';
 import 'dio_client.dart';
+import '../services/logger_service.dart';
 
 class SalesService {
   static Future<SalesResponse> fetchSales({
@@ -20,26 +21,46 @@ class SalesService {
     };
 
     try {
+      LoggerService.debug('[SALES] Fetching sales with query: $queryParams');
+
       final response = await dio.get(
         '/sales',
         queryParameters: queryParams,
       );
 
       final data = response.data;
-      final List<SaleTransaction> sales = (data['data'] as List)
-          .map((e) => SaleTransaction.fromJson(e))
-          .toList();
+      final List<dynamic> rawSales = data['data'] ?? [];
+      final List<SaleTransaction> sales =
+      rawSales.map((e) => SaleTransaction.fromJson(e)).toList();
 
-      final int totalPrice = data['total_price'] ?? 0;
-      final double totalWeightKg = (data['total_weight_kg'] ?? 0).toDouble();
+      final int totalPrice = int.tryParse(data['totalPrice']?.toString() ?? '0') ?? 0;
+      final double totalWeightKg = double.tryParse(data['totalWeightKg']?.toString() ?? '0') ?? 0.0;
+
+      LoggerService.info('[SALES] Successfully fetched ${sales.length} transactions');
 
       return SalesResponse(
         sales: sales,
         totalPrice: totalPrice,
         totalWeightKg: totalWeightKg,
       );
-    } catch (e) {
-      throw Exception('Gagal mengambil data sales: $e');
+    } on DioException catch (e, stackTrace) {
+      final statusCode = e.response?.statusCode;
+      final message = e.response?.data?['message'] ?? e.message;
+
+      LoggerService.error(
+        '[SALES] Failed to fetch sales data',
+        error: 'Status $statusCode: $message',
+        stackTrace: stackTrace,
+      );
+
+      throw Exception('Failed to fetch sales data (Status $statusCode): $message');
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        '[SALES] Unexpected error while fetching sales',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw Exception('Unexpected error while fetching sales data: $e');
     }
   }
 
@@ -47,14 +68,33 @@ class SalesService {
     final dio = DioClient.dio;
 
     try {
-      final response = await dio.put('/sales/soft-delete/$id');
+      LoggerService.debug('[SALES] Attempting to delete sale transaction ID: $id');
+
+      final response = await dio.delete('/sales/$id');
 
       if (response.statusCode != 200) {
         final data = response.data;
-        throw Exception('Gagal menghapus transaksi: ${data['message'] ?? 'Unknown error'}');
+        final msg = data['message'] ?? 'Unknown error';
+        LoggerService.warning('[SALES] Failed to delete transaction: $msg');
+        throw Exception('Failed to delete transaction: $msg');
       }
-    } catch (e) {
-      throw Exception('Gagal menghapus transaksi: $e');
+
+      LoggerService.info('[SALES] Transaction ID $id deleted successfully');
+    } on DioException catch (e, stackTrace) {
+      final msg = e.response?.data['message'] ?? e.message;
+      LoggerService.error(
+        '[SALES] DioException while deleting transaction',
+        error: msg,
+        stackTrace: stackTrace,
+      );
+      throw Exception('Delete transaction failed: $msg');
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        '[SALES] Unexpected error while deleting transaction',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw Exception('Unexpected error while deleting transaction: $e');
     }
   }
 
@@ -62,28 +102,39 @@ class SalesService {
     final dio = DioClient.dio;
 
     try {
+      LoggerService.debug('[SALES] Creating sales transaction with payload: ${transaction.toJson()}');
+
       final response = await dio.post(
         '/sales/',
-        data: jsonEncode(transaction.toJson()),
+        data: transaction.toJson(),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          validateStatus: (status) => status != null && status < 500,
+        ),
       );
 
-      if (response.statusCode == 201) {
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        LoggerService.info('[SALES] Transaction created successfully');
         return true;
       } else {
-        print("Failed to create sales transaction. Status code: ${response.statusCode}");
-        print("Response body: ${response.data}");
-
-        try {
-          final error = response.data;
-          print('Error message: ${error['message']}');
-        } catch (_) {
-          print('Unable to parse error response.');
-        }
-
+        LoggerService.warning(
+          '[SALES] Failed to create transaction. Status: ${response.statusCode}, Body: ${response.data}',
+        );
         return false;
       }
-    } catch (e) {
-      print('Exception saat createSalesTransaction: $e');
+    } on DioException catch (e, stackTrace) {
+      LoggerService.error(
+        '[SALES] DioException while creating transaction',
+        error: e.response?.data ?? e.message,
+        stackTrace: stackTrace,
+      );
+      return false;
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        '[SALES] Unexpected error while creating transaction',
+        error: e,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }

@@ -7,7 +7,6 @@ class ProfitShareList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<FinanceProvider>(
       builder: (context, provider, child) {
-        print("Jumlah profit shares: ${provider.profitShares.length}");
         return Column(
           children: provider.profitShares.map((share) {
             return Container(

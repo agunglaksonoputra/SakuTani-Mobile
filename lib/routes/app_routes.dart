@@ -9,6 +9,7 @@ import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import '../components/reports_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
+import '../screens/shares/shares_recording_screen.dart';
 
 class AppRoutes {
   static const String home = '/home';
@@ -21,6 +22,7 @@ class AppRoutes {
   static const String expenses = '/expenses';
   static const String expensesRecord = '/expenses/record';
   static const String bagiHasil = '/shares';
+  static const String withdrawRecord = '/withdraw';
 
   static Map<String, WidgetBuilder> routes = {
 
@@ -34,6 +36,7 @@ class AppRoutes {
     expenses: (context) => ExpensesScreen(),
     expensesRecord: (context) => ExpensesRecordScreen(),
     bagiHasil: (context) => SharesScreen(),
+    withdrawRecord: (context) => WithdrawRecordScreen(),
 
   };
 }

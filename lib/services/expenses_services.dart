@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'package:saku_tani_mobile/models/expenses_transaction.dart';
-
 import '../models/expenses_response.dart';
 import 'dio_client.dart';
+import 'logger_service.dart';
 
 class ExpensesServices {
+  /// Fetch expenses transactions with optional filters
   static Future<ExpensesResponse> fetchExpenses({
     int page = 1,
     int limit = 10,
@@ -21,70 +22,74 @@ class ExpensesServices {
     };
 
     try {
+      LoggerService.debug('[EXPENSES] Fetching expenses with query: $queryParams');
+
       final response = await dio.get(
         '/expenses',
         queryParameters: queryParams,
       );
 
-      final data = response.data;
-      final List<ExpensesTransaction> expenses = (data['data'] as List)
-          .map((e) => ExpensesTransaction.fromJson(e))
-          .toList();
-
-      final int totalAmount = data['total_amount'] ?? 0;
-
-      return ExpensesResponse(
-        expenses: expenses,
-        totalAmount: totalAmount,
-      );
-    } catch (e) {
-      throw Exception('Gagal mengambil data sales: $e');
+      LoggerService.info('[EXPENSES] Expenses fetched successfully.');
+      return ExpensesResponse.fromJson(response.data);
+    } catch (e, stackTrace) {
+      LoggerService.error('[EXPENSES] Failed to fetch expenses.', error: e, stackTrace: stackTrace);
+      throw Exception('Failed to fetch expenses: $e');
     }
   }
 
+  /// Create a new expense transaction
   static Future<bool> createExpensesTransaction(ExpensesTransaction transaction) async {
     final dio = DioClient.dio;
 
     try {
+      LoggerService.debug('[EXPENSES] Creating transaction: ${transaction.toJson()}');
+
       final response = await dio.post(
-        '/expenses/',
+        '/expenses',
         data: jsonEncode(transaction.toJson()),
       );
 
       if (response.statusCode == 201) {
+        LoggerService.info('[EXPENSES] Transaction created successfully.');
         return true;
       } else {
-        print("Failed to create expenses transaction. Status code: ${response.statusCode}");
-        print("Response body: ${response.data}");
+        LoggerService.warning('[EXPENSES] Failed to create transaction. Status: ${response.statusCode}');
+        LoggerService.debug('Response: ${response.data}');
 
         try {
           final error = response.data;
-          print('Error message: ${error['message']}');
+          LoggerService.error('Server message: ${error['message']}');
         } catch (_) {
-          print('Unable to parse error response.');
+          LoggerService.warning('Unable to parse error response from server.');
         }
 
         return false;
       }
-    } catch (e) {
-      print('Exception saat createSalesTransaction: $e');
+    } catch (e, stackTrace) {
+      LoggerService.error('[EXPENSES] Exception occurred during transaction creation.', error: e, stackTrace: stackTrace);
       return false;
     }
   }
 
-
+  /// Soft delete an expense transaction by ID
   static Future<void> softDeleteExpensesTransaction(int id) async {
     final dio = DioClient.dio;
 
     try {
-      final response = await dio.put('/expenses/soft-delete/$id');
+      LoggerService.debug('[EXPENSES] Attempting to delete transaction with ID: $id');
 
-      if (response.statusCode != 200) {
-        final data = response.data;
-        throw Exception('Gagal menghapus transaksi: ${data['message'] ?? 'Unknown error'}');
+      final response = await dio.delete('/expenses/$id');
+
+      if (response.statusCode == 200) {
+        LoggerService.info('[EXPENSES] Transaction deleted successfully.');
+      } else {
+        final message = response.data['message'] ?? 'Unknown error';
+        LoggerService.error('[EXPENSES] Failed to delete transaction. Message: $message');
+        throw Exception('Failed to delete transaction: $message');
       }
-    } catch (e) {
-      throw Exception('Gagal menghapus transaksi: $e');
+    } catch (e, stackTrace) {
+      LoggerService.error('[EXPENSES] Exception occurred during deletion.', error: e, stackTrace: stackTrace);
+      throw Exception('Failed to delete transaction: $e');
     }
   }
 }

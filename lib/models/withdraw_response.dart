@@ -1,32 +1,22 @@
 import 'package:intl/intl.dart';
 
-class ExpensesTransaction {
+class WithdrawResponse {
   final int? id;
-  final DateTime? date;
   final String? name;
-  final double? quantity;
-  final String? unit;
-  final double? pricePerUnit;
-  final double? shippingCost;
-  final double? discount;
-  final double? totalAmount;
-  final String? notes;
+  final double? amount;
+  final DateTime? date;
   final DateTime? createdAt;
   final DateTime? updatedAt;
+  final DateTime? deletedAt;
 
-  ExpensesTransaction({
+  WithdrawResponse({
     this.id,
-    this.date,
     this.name,
-    this.quantity,
-    this.unit,
-    this.pricePerUnit,
-    this.shippingCost,
-    this.discount,
-    this.totalAmount,
-    this.notes,
+    this.amount,
+    this.date,
     this.createdAt,
     this.updatedAt,
+    this.deletedAt,
   });
 
   String get formattedDate {
@@ -54,33 +44,27 @@ class ExpensesTransaction {
     return formatter.format(value ?? 0);
   }
 
-  factory ExpensesTransaction.fromJson(Map<String, dynamic> json) {
-    return ExpensesTransaction(
+  static String _capitalize(String? value) {
+    if (value == null || value.isEmpty) return '-';
+    return value[0].toUpperCase() + value.substring(1);
+  }
+
+  factory WithdrawResponse.fromJson(Map<String, dynamic> json) {
+    return WithdrawResponse(
       id: json['id'],
-      date: json['date'] != null ? DateTime.parse(json['date']) : null,
       name: json['name'],
-      quantity: double.tryParse(json['quantity']),
-      unit: json['unit'],
-      pricePerUnit: double.tryParse(json['price_per_unit']),
-      shippingCost: double.tryParse(json['shipping_cost']),
-      discount: double.tryParse(json['discount']),
-      totalAmount: double.tryParse(json['total_price']),
-      notes: json['notes'],
+      amount: double.tryParse(json['amount']),
+      date: json['date'] != null ? DateTime.parse(json['date']) : null,
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
+      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
       'name': name,
-      'quantity': quantity,
-      'unit': unit,
-      'price_per_unit': pricePerUnit,
-      'shipping_cost': shippingCost,
-      'discount': discount,
-      'total_price': totalAmount,
-      'notes': notes,
+      'amount': amount,
     };
   }
 }

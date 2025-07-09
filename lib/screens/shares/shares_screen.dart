@@ -4,7 +4,10 @@ import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/models/user_balance.dart';
 import 'package:saku_tani_mobile/providers/shares_provider.dart';
 
+import '../../components/period_selector.dart';
 import '../../components/summary_cards.dart';
+import '../../components/withdraw_transaction_item.dart';
+import '../../routes/app_routes.dart';
 
 class SharesScreen extends StatefulWidget {
   @override
@@ -12,12 +15,34 @@ class SharesScreen extends StatefulWidget {
 }
 
 class _SharesScreenState extends State<SharesScreen> {
+  late ScrollController _scrollController;
+
   @override
   void initState() {
     super.initState();
+
+    _scrollController = ScrollController()
+      ..addListener(() {
+        if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200) {
+          final provider = Provider.of<SharesProvider>(context, listen: false);
+          if (provider.hasMore && !provider.isLoadingMore) {
+            provider.loadMoreWithdrawLog();
+          }
+        }
+      });
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SharesProvider>(context, listen: false).loadUserBalances();
+      final provider = Provider.of<SharesProvider>(context, listen: false);
+      provider.loadUserBalances();
+      provider.loadMoreWithdrawLog();
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
@@ -54,7 +79,12 @@ class _SharesScreenState extends State<SharesScreen> {
                       ],
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.withdrawRecord).then((_) {
+                          // Setelah halaman input ditutup, panggil refresh
+                          Provider.of<SharesProvider>(context, listen: false).refreshData();
+                        });
+                      },
                       child: Container(
                         width: 40,
                         height: 40,
@@ -84,11 +114,20 @@ class _SharesScreenState extends State<SharesScreen> {
               return Center(child: CircularProgressIndicator());
             }
 
+            final data = provider.filteredTransactions;
+
             return ListView(
+              controller: _scrollController,
               padding: EdgeInsets.all(16),
               children: [
+                PeriodSelector(
+                  selectedRange: provider.selectedDateRange,
+                  onClear: provider.clearDateFilter,
+                  onSelect: (range) => provider.setDateFilter(range),
+                ),
+                const SizedBox(height: 20),
                 SummaryCard(
-                  title: provider.zakatBalance.userName,
+                  title: provider.zakatBalance.name,
                   value: provider.formatCurrency(provider.zakatBalance.balance),
                   color: Color(0xFFF43F5E),
                   textColor: Colors.white,
@@ -101,7 +140,7 @@ class _SharesScreenState extends State<SharesScreen> {
                     return SizedBox(
                       width: (MediaQuery.of(context).size.width - 44) / 2,
                       child: SummaryCard(
-                        title: user.userName,
+                        title: user.name,
                         value: provider.formatCurrency(user.balance),
                         color: Color(0xFF10B981),
                         textColor: Colors.white,
@@ -109,6 +148,49 @@ class _SharesScreenState extends State<SharesScreen> {
                     );
                   }).toList(),
                 ),
+                const SizedBox(height: 24),
+                const Text(
+                  'Daftar Transaksi',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                if (data.isEmpty)
+                  Column(
+                    children: [
+                      const SizedBox(height: 40),
+                      const FaIcon(
+                        FontAwesomeIcons.fileCircleXmark,
+                        size: 50,
+                        color: Colors.grey,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text(
+                        'Tidak ada transaksi',
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                    ],
+                  )
+                else
+                  ...data.map((transaction) => Padding(
+                    padding: const EdgeInsets.only(bottom: 24.0),
+                    child: WithdrawTransactionItem(
+                      transaction: transaction,
+                      onDelete: () =>
+                          _showDeleteDialog(context, transaction.id!),
+                    ),
+                  )),
+
+                if (provider.isLoadingMore)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 24),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+
+                if (!provider.hasMore && data.isNotEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                    child: Center(child: Text("Semua data telah dimuat.")),
+                  ),
               ],
             );
           },
@@ -116,4 +198,32 @@ class _SharesScreenState extends State<SharesScreen> {
       ),
     );
   }
+
+  void _showDeleteDialog(BuildContext context, int transactionId) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Hapus Transaksi'),
+        content: Text('Apakah Anda yakin ingin menghapus transaksi ini?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () {
+              // Provider.of<SharesProvider>(context, listen: false)
+              //     .deleteTransaction(transactionId);
+              // Navigator.pop(context);
+            },
+            child: Text(
+              'Hapus',
+              style: TextStyle(color: Colors.red),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }
