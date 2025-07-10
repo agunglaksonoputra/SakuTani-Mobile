@@ -168,6 +168,17 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
                         },
                       ),
                     )),
+                  if (provider.isLoadingMore)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 24),
+                      child: Center(child: CircularProgressIndicator()),
+                    ),
+
+                  if (!provider.hasMore && data.isNotEmpty)
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      child: Center(child: Text("Semua data telah dimuat.")),
+                    ),
                 ],
 
               ],
