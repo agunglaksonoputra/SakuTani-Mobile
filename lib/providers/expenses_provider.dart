@@ -45,8 +45,8 @@ class ExpensesProvider extends ChangeNotifier {
 
       LoggerService.info('[EXPENSES] Initial data fetched successfully. '
           'Total: ${_transactions.length}, Summary: $_summary');
-    } catch (e, st) {
-      LoggerService.error('[EXPENSES] Failed to fetch initial data.', error: e, stackTrace: st);
+    } catch (e, stackTrace) {
+      LoggerService.error('[EXPENSES] Failed to fetch initial data.', error: e, stackTrace: stackTrace);
     }
 
     _isLoading = false;

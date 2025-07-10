@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/providers/auth_provider.dart';
 import 'package:saku_tani_mobile/providers/expenses_provider.dart';
 import 'package:saku_tani_mobile/providers/expenses_record_provider.dart';
+import 'package:saku_tani_mobile/providers/monthly_report_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 import 'package:saku_tani_mobile/providers/shares_provider.dart';
 import 'package:saku_tani_mobile/providers/shares_record_provider.dart';
@@ -38,6 +39,7 @@ class MainApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => ExpensesRecordProvider()),
         ChangeNotifierProvider(create: (_) => SharesProvider()),
         ChangeNotifierProvider(create: (_) => SharesRecordProvider()),
+        ChangeNotifierProvider(create: (_) => MonthlyReportProvider()),
       ],
       child: MaterialApp(
         navigatorKey: DioClient.navigatorKey,
