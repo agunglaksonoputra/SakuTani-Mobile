@@ -37,18 +37,41 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    IconButton(
-                      icon: Icon(FontAwesomeIcons.angleLeft, color: Colors.black),
-                      onPressed: () => Navigator.pop(context),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(FontAwesomeIcons.angleLeft, color: Colors.black),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Laporan Bulanan',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 20,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Laporan Bulanan',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
-                        color: Colors.black,
+                    GestureDetector(
+                      onTap: () {
+                        Provider.of<MonthlyReportProvider>(context, listen: false).downloadExcelFile(context);
+                      },
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Color(0xFF8B5CF6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: Icon(
+                          FontAwesomeIcons.download,
+                          color: Colors.white,
+                          size: 20,
+                        ),
                       ),
                     ),
                   ],
