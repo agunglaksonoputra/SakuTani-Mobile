@@ -1,19 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
+import 'package:intl/intl.dart';
 import '../models/finance.dart';
 import '../providers/finance_provider.dart';
-import 'dart:ui' as ui;
 
 class CashflowChart extends StatelessWidget {
+  const CashflowChart({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Consumer<FinanceProvider>(
       builder: (context, provider, child) {
-        final chartData = provider.cashflowData;
+        final data = provider.cashflowData;
+        if (data.isEmpty) {
+          return const Center(child: Text('Tidak ada data'));
+        }
+
+        final maxValue = data.fold<double>(
+          0,
+              (max, item) =>
+              [max, item.income, item.expense].reduce((a, b) => a > b ? a : b),
+        );
 
         return Container(
-          height: 240,
+          height: 400,
           padding: const EdgeInsets.all(16.0),
           decoration: BoxDecoration(
             color: Colors.white,
@@ -27,24 +38,62 @@ class CashflowChart extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   _buildLegend(Colors.blue, 'Pendapatan'),
-                  SizedBox(width: 20),
+                  const SizedBox(width: 20),
                   _buildLegend(Colors.orange, 'Pengeluaran'),
                 ],
               ),
-              SizedBox(height: 16),
-
-              // Chart
+              const SizedBox(height: 16),
               Expanded(
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return CustomPaint(
-                      painter: CashflowChartPainter(
-                        chartData,
-                        availableWidth: constraints.maxWidth,
+                child: BarChart(
+                  BarChartData(
+                    maxY: maxValue * 1.15,
+                    titlesData: FlTitlesData(
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 32,
+                          getTitlesWidget: (value, meta) {
+                            final index = value.toInt();
+                            if (index < 0 || index >= data.length) {
+                              return const SizedBox.shrink();
+                            }
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Text(
+                                data[index].label,
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                            );
+                          },
+                        ),
                       ),
-                      size: Size(constraints.maxWidth, 200),
-                    );
-                  },
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40,
+                          getTitlesWidget: (value, meta) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 4),
+                              child: Text(
+                                NumberFormat.compact(locale: 'id_ID').format(value),
+                                style: const TextStyle(fontSize: 10),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      topTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(showTitles: false),
+                      ),
+                    ),
+                    gridData: const FlGridData(show: true),
+                    borderData: FlBorderData(show: false),
+                    barTouchData: BarTouchData(enabled: true),
+                    barGroups: _generateBarGroups(data),
+                  ),
                 ),
               ),
             ],
@@ -54,102 +103,37 @@ class CashflowChart extends StatelessWidget {
     );
   }
 
+  List<BarChartGroupData> _generateBarGroups(List<CashflowData> data) {
+    return List.generate(data.length, (index) {
+      final item = data[index];
+      return BarChartGroupData(
+        x: index,
+        barRods: [
+          BarChartRodData(
+            toY: item.income,
+            width: 8,
+            color: Colors.blue,
+            borderRadius: BorderRadius.zero,
+          ),
+          BarChartRodData(
+            toY: item.expense,
+            width: 8,
+            color: Colors.orange,
+            borderRadius: BorderRadius.zero,
+          ),
+        ],
+        barsSpace: 4,
+      );
+    });
+  }
+
   Widget _buildLegend(Color color, String label) {
     return Row(
       children: [
         Container(width: 12, height: 12, color: color),
-        SizedBox(width: 4),
-        Text(label, style: TextStyle(fontSize: 12)),
+        const SizedBox(width: 4),
+        Text(label, style: const TextStyle(fontSize: 12)),
       ],
     );
   }
-}
-
-class CashflowChartPainter extends CustomPainter {
-  final List<CashflowData> data;
-  final double availableWidth;
-
-  CashflowChartPainter(this.data, {required this.availableWidth});
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    if (data.isEmpty) return;
-
-    final paint = Paint()..style = PaintingStyle.fill;
-    final textStyle = TextStyle(color: Colors.black, fontSize: 10);
-    final textPainter = TextPainter(
-      textAlign: TextAlign.center,
-      textDirection: ui.TextDirection.ltr,
-    );
-
-    final paddingBottom = 30.0;
-    final paddingLeft = 40.0;
-    final chartHeight = size.height - paddingBottom;
-    final chartWidth = size.width - paddingLeft;
-
-    final maxValue = data.fold<double>(
-      0,
-          (max, item) => [max, item.income, item.expense].reduce((a, b) => a > b ? a : b),
-    );
-
-    final groupCount = data.length;
-    final groupSpacing = chartWidth / (groupCount + 1); // +1 to add a bit of spacing on right
-    final barWidth = groupSpacing / 2.5;
-
-    // Garis bantu Y
-    final step = maxValue / 4;
-    for (int i = 0; i <= 4; i++) {
-      final yValue = step * i;
-      final y = chartHeight - (yValue / maxValue * chartHeight);
-
-      // Line
-      canvas.drawLine(
-        Offset(paddingLeft, y),
-        Offset(size.width, y),
-        Paint()
-          ..color = Colors.grey.withOpacity(0.2)
-          ..strokeWidth = 1,
-      );
-
-      // Label Y
-      textPainter.text = TextSpan(
-        text: NumberFormat.compact(locale: 'id_ID').format(yValue),
-        style: textStyle,
-      );
-      textPainter.layout();
-      textPainter.paint(canvas, Offset(paddingLeft - textPainter.width - 6, y - 6));
-    }
-
-    // Bars
-    for (int i = 0; i < data.length; i++) {
-      final xGroup = paddingLeft + (i + 1) * groupSpacing;
-
-      // Income
-      paint.color = Colors.blue;
-      final incomeHeight = (data[i].income / maxValue) * chartHeight;
-      canvas.drawRect(
-        Rect.fromLTWH(xGroup - barWidth, chartHeight - incomeHeight, barWidth, incomeHeight),
-        paint,
-      );
-
-      // Expense
-      paint.color = Colors.orange;
-      final expenseHeight = (data[i].expense / maxValue) * chartHeight;
-      canvas.drawRect(
-        Rect.fromLTWH(xGroup + 2, chartHeight - expenseHeight, barWidth, expenseHeight),
-        paint,
-      );
-
-      // Label tanggal
-      textPainter.text = TextSpan(text: data[i].label, style: textStyle);
-      textPainter.layout();
-      textPainter.paint(
-        canvas,
-        Offset(xGroup - textPainter.width / 2, chartHeight + 4),
-      );
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
