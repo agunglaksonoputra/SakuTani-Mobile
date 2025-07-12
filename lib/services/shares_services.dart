@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:dio/dio.dart';
 import 'package:saku_tani_mobile/models/user_balance.dart';
 import 'package:saku_tani_mobile/models/withdraw_response.dart';
 import 'dio_client.dart';
@@ -100,6 +101,40 @@ class ShareService {
     } catch (e, stackTrace) {
       LoggerService.error('Exception saat createWithdrawTransaction', error: e, stackTrace: stackTrace);
       return false;
+    }
+  }
+
+  static Future<void> softDeleteWithdrawTransaction(int id) async {
+    final dio = DioClient.dio;
+
+    try {
+      LoggerService.debug('[WITHDRAW] Attempting to delete withdraw transaction ID: $id');
+
+      final response = await dio.delete('/withdraw/$id');
+
+      if (response.statusCode != 200) {
+        final data = response.data;
+        final msg = data['message'] ?? 'Unknown error';
+        LoggerService.warning('[WITHDRAW] Failed to delete transaction: $msg');
+        throw Exception('Failed to delete transaction: $msg');
+      }
+
+      LoggerService.info('[WITHDRAW] Transaction ID $id deleted successfully');
+    } on DioException catch (e, stackTrace) {
+      final msg = e.response?.data['message'] ?? e.message;
+      LoggerService.error(
+        '[WITHDRAW] DioException while deleting transaction',
+        error: msg,
+        stackTrace: stackTrace,
+      );
+      throw Exception('Delete transaction failed: $msg');
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        '[WITHDRAW] Unexpected error while deleting transaction',
+        error: e,
+        stackTrace: stackTrace,
+      );
+      throw Exception('Unexpected error while deleting transaction: $e');
     }
   }
 }
