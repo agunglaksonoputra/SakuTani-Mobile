@@ -10,6 +10,7 @@ import '../services/logger_service.dart';
 class SalesRecordProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
+  DateTime? selectedDate;
 
   final TextEditingController customerController = TextEditingController();
   final TextEditingController vegetableController = TextEditingController();
@@ -46,6 +47,26 @@ class SalesRecordProvider with ChangeNotifier {
     return double.tryParse(input.replaceAll('.', '').replaceAll(',', '.')) ?? 0;
   }
 
+  DateTime? convertToIsoDate(String text) {
+    final parts = text.split(' ');
+    if (parts.length == 3) {
+      final day = int.tryParse(parts[0]);
+      final monthName = parts[1];
+      final year = int.tryParse(parts[2]);
+
+      const bulan = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      ];
+      final month = bulan.indexOf(monthName) + 1;
+
+      if (day != null && month > 0 && year != null) {
+        return DateTime(year, month, day);
+      }
+    }
+    return null;
+  }
+
   // Auto-calculation: total price = quantity * price/unit
   double get totalPriceCount {
     final quantity = parseIndoNumber(quantityController.text);
@@ -62,7 +83,7 @@ class SalesRecordProvider with ChangeNotifier {
 
   /// Submit new sales transaction
   Future<bool> submitSalesRecord() async {
-    if (!_validateForm()) {
+    if (!validateForm()) {
       _errorMessage = 'All required fields must be filled.';
       notifyListeners();
       LoggerService.warning('[SALES] Submission failed: Validation failed.');
@@ -75,6 +96,7 @@ class SalesRecordProvider with ChangeNotifier {
 
     try {
       final sale = SaleTransaction(
+        date: selectedDate,
         customerName: customerController.text,
         itemName: vegetableController.text,
         quantity: parseIndoNumber(quantityController.text),
@@ -133,7 +155,7 @@ class SalesRecordProvider with ChangeNotifier {
   }
 
   /// Form validation
-  bool _validateForm() {
+  bool validateForm() {
     final quantity = parseIndoNumber(quantityController.text);
     final totalPrice = parseIndoNumber(totalPriceController.text);
     final totalWeight = parseIndoNumber(totalWeightPerKgController.text);
@@ -148,6 +170,7 @@ class SalesRecordProvider with ChangeNotifier {
 
   /// Clear all form fields
   void clearForm() {
+    selectedDate = null;
     customerController.clear();
     vegetableController.clear();
     quantityController.clear();

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-
 import 'custom_text_field.dart';
 
-class CustomTextFieldWithMax extends StatelessWidget {
+class CustomTextFieldButton extends StatelessWidget {
   final String label;
   final TextEditingController controller;
   final TextInputType keyboardType;
@@ -14,7 +13,7 @@ class CustomTextFieldWithMax extends StatelessWidget {
   final double? maxValue;
   final double? userBalance;
 
-  const CustomTextFieldWithMax({
+  const CustomTextFieldButton({
     Key? key,
     required this.label,
     required this.controller,

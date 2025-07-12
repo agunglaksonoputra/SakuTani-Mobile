@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/expenses_transaction_item.dart';
-import 'package:saku_tani_mobile/components/transaction_item.dart';
+import 'package:saku_tani_mobile/components/transaction_items/expenses_transaction_item.dart';
+import 'package:saku_tani_mobile/components/transaction_items/sales_transaction_item.dart';
 import 'package:saku_tani_mobile/models/expenses_transaction.dart';
 import 'package:saku_tani_mobile/models/monthly_report_response.dart';
 import 'package:saku_tani_mobile/models/sale_transaction.dart';
-
 import '../../models/transaction_record.dart';
 import '../../providers/monthly_report_provider.dart';
 
@@ -117,7 +116,7 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
     switch (item.type) {
       case TransactionType.sale:
         if (item.data is SaleTransaction) {
-          return TransactionItem(transaction: item.data as SaleTransaction);
+          return SalesTransactionItem(transaction: item.data as SaleTransaction);
           // return SalesTransactionCard(sale: item.data as SaleTransaction);
         } else {
           return const SizedBox(); // atau tampilkan error

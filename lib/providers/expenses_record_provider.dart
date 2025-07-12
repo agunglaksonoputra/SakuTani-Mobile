@@ -7,6 +7,7 @@ import 'package:saku_tani_mobile/services/logger_service.dart';
 class ExpensesRecordProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
+  DateTime? selectedDate;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController quantityController = TextEditingController();
@@ -41,6 +42,7 @@ class ExpensesRecordProvider with ChangeNotifier {
 
     try {
       final record = ExpensesTransaction(
+        date: selectedDate,
         name: nameController.text,
         quantity: parseIndoNumber(quantityController.text),
         unit: unitController.text,
@@ -108,6 +110,7 @@ class ExpensesRecordProvider with ChangeNotifier {
   }
 
   void clearForm() {
+    selectedDate = null;
     nameController.clear();
     quantityController.clear();
     unitController.clear();

@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/period_selector.dart';
+import 'package:saku_tani_mobile/components/periode_selector.dart';
 import 'package:saku_tani_mobile/components/summary_cards.dart';
-import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
+import 'package:saku_tani_mobile/components/transaction_items/sales_transaction_item.dart';
 import 'package:saku_tani_mobile/screens/sales/sales_recording_screen.dart';
-
-import '../../components/transaction_item.dart';
 import '../../providers/sales_provider.dart';
 
 class SalesScreen extends StatefulWidget {
@@ -127,7 +125,7 @@ class _SalesScreenState extends State<SalesScreen> {
               controller: _scrollController,
               padding: EdgeInsets.all(16),
               children: [
-                PeriodSelector(
+                PeriodeSelector(
                   selectedRange: provider.selectedDateRange,
                   onClear: provider.clearDateFilter,
                   onSelect: (range) => provider.setDateFilter(range),
@@ -162,7 +160,7 @@ class _SalesScreenState extends State<SalesScreen> {
                 const SizedBox(height: 12),
                 ...data.map((transaction) => Padding(
                   padding: const EdgeInsets.only(bottom: 12.0),
-                  child: TransactionItem(
+                  child: SalesTransactionItem(
                     transaction: transaction,
                     onDelete: () {
                       _showDeleteDialog(context, transaction.id!);

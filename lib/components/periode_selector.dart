@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 
-class PeriodSelector extends StatelessWidget {
+class PeriodeSelector extends StatelessWidget {
   final DateTimeRange? selectedRange;
   final VoidCallback onClear;
   final Function(DateTimeRange) onSelect;
 
-  const PeriodSelector({
+  const PeriodeSelector({
     super.key,
     required this.selectedRange,
     required this.onClear,

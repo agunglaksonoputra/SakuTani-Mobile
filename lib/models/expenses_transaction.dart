@@ -11,6 +11,7 @@ class ExpensesTransaction {
   final double? discount;
   final double? totalAmount;
   final String? notes;
+  final String? createdBy;
   final DateTime? createdAt;
   final DateTime? updatedAt;
 
@@ -25,6 +26,7 @@ class ExpensesTransaction {
     this.discount,
     this.totalAmount,
     this.notes,
+    this.createdBy,
     this.createdAt,
     this.updatedAt,
   });
@@ -37,12 +39,9 @@ class ExpensesTransaction {
   String formatDouble(double? value) {
     if (value == null || value == 0) return '0';
 
-    // Format dengan 2 desimal dulu
-    String result = value.toStringAsFixed(2);
+    final formatter = NumberFormat("#,##0.##", "id_ID");
 
-    // Hilangkan nol di belakang koma jika tidak diperlukan (contoh: 1.50 -> 1.5, 1.00 -> 1)
-    result = result.replaceFirst(RegExp(r'\.?0+$'), '');
-    return result;
+    return formatter.format(value);
   }
 
   String formatCurrency(double? value) {
@@ -66,6 +65,7 @@ class ExpensesTransaction {
       discount: double.tryParse(json['discount']),
       totalAmount: double.tryParse(json['total_price']),
       notes: json['notes'],
+      createdBy: json['created_by'],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
@@ -73,6 +73,7 @@ class ExpensesTransaction {
 
   Map<String, dynamic> toJson() {
     return {
+      'date': date != null ? DateFormat('yyyy-MM-dd').format(date!) : null,
       'name': name,
       'quantity': quantity,
       'unit': unit,

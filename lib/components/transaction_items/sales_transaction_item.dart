@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:saku_tani_mobile/models/expenses_transaction.dart';
+import '../../models/sale_transaction.dart';
 
-class ExpensesTransactionItem extends StatelessWidget {
-  final ExpensesTransaction transaction;
+class SalesTransactionItem extends StatelessWidget {
+  final SaleTransaction transaction;
   final VoidCallback? onDelete;
 
-  const ExpensesTransactionItem({
+  const SalesTransactionItem({
     Key? key,
     required this.transaction,
     this.onDelete,
@@ -14,6 +14,8 @@ class ExpensesTransactionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // final salesProvider = Provider.of<SalesProvider>(context, listen: false);
+
     return InkWell(
       onTap: () => _showDetailDialog(context),
       borderRadius: BorderRadius.circular(12),
@@ -38,7 +40,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: Color(0xFFF43F5E),
+                    color: Color(0xFF10B981),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -53,7 +55,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        transaction.name ?? 'Pelanggan',
+                        transaction.customerName ?? 'Pelanggan',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -75,20 +77,27 @@ class ExpensesTransactionItem extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      '${transaction.formatCurrency(transaction.totalAmount)}',
+                      '${transaction.formatCurrency(transaction.totalPrice)}',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1A1A1A),
                       ),
                     ),
+                    const SizedBox(height: 4),
+                    Text(
+                      '${transaction.formatDouble(transaction.quantity) ?? 0} ${transaction.unit}/${transaction.formatDouble(transaction.totalWeightKg)} kg',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF6B7280),
+                      ),
+                    ),
                   ],
                 ),
-                if (onDelete != null && _isToday(transaction.date)) ...[
-                  SizedBox(width: 8),
+                if (onDelete != null && _isDeleted(transaction.date)) ...[
+                  const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
-                      print('Icon delete ditekan');
                       onDelete?.call();
                     },
                     borderRadius: BorderRadius.circular(6),
@@ -108,6 +117,28 @@ class ExpensesTransactionItem extends StatelessWidget {
                 ],
               ],
             ),
+            if (transaction.itemName != null) ...[
+              SizedBox(height: 12),
+              Row(
+                children: [
+                  Icon(
+                    Icons.inventory_2_outlined,
+                    size: 16,
+                    color: Color(0xFF6B7280),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      transaction.itemName!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Color(0xFF4B5563),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
             if (transaction.notes != null && transaction.notes!.isNotEmpty) ...[
               SizedBox(height: 8),
               Row(
@@ -118,7 +149,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                     size: 16,
                     color: Color(0xFF6B7280),
                   ),
-                  SizedBox(width: 8),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       transaction.notes!,
@@ -157,13 +188,15 @@ class ExpensesTransactionItem extends StatelessWidget {
               },
               children: [
                 _buildTableRow('Tanggal', transaction.formattedDate),
-                _buildTableRow('Nama', transaction.name ?? '-'),
-                _buildTableRow('Jumlah', '${transaction.formatDouble(transaction.quantity)} ${transaction.unit}'),
+                _buildTableRow('Nama Pelanggan', transaction.customerName ?? '-'),
+                _buildTableRow('Nama Barang', transaction.itemName ?? '-'),
+                _buildTableRow('Jumlah', '${transaction.formatDouble(transaction.quantity) ?? 0} ${transaction.unit}'),
+                _buildTableRow('Berat per Unit', '${transaction.formatDouble(transaction.weightPerUnitGram)} gram'),
+                _buildTableRow('Total Berat', '${transaction.formatDouble(transaction.totalWeightKg)} kg'),
                 _buildTableRow('Harga per Unit', transaction.formatCurrency(transaction.pricePerUnit)),
-                _buildTableRow('Ongkir', transaction.formatCurrency(transaction.shippingCost ?? 0)),
-                _buildTableRow('Diskon', transaction.formatCurrency(transaction.discount ?? 0)),
-                _buildTableRow('Total Harga', transaction.formatCurrency(transaction.totalAmount)),
+                _buildTableRow('Total Harga', transaction.formatCurrency(transaction.totalPrice)),
                 _buildTableRow('Catatan', transaction.notes ?? ''),
+                _buildTableRow('Dibuat Oleh', transaction.createdBy ?? ''),
               ],
             ),
           ),
@@ -200,13 +233,15 @@ class ExpensesTransactionItem extends StatelessWidget {
     );
   }
 
-  bool _isToday(DateTime? date) {
+  bool _isDeleted(DateTime? date) {
     if (date == null) return false;
     final now = DateTime.now();
+    final sevenDaysAgo = now.subtract(Duration(days: 6)); // termasuk hari ini
     final localDate = date.toLocal();
-    return localDate.year == now.year &&
-        localDate.month == now.month &&
-        localDate.day == now.day;
+
+    return !localDate.isAfter(now) && !localDate.isBefore(
+        DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day)
+    );
   }
 
 }

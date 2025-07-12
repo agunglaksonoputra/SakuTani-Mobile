@@ -15,10 +15,12 @@ class AuthService {
 
       final data = response.data;
       final token = data['token'];
+      final role = data['user']['role'];
 
       if (response.statusCode == 200 && data['success'] == true && token != null) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setString('auth_token', token);
+        await prefs.setString('auth_role', role);
         await DioClient.initialize();
 
         LoggerService.info('[LOGIN] Login successful. Token stored.');
@@ -104,6 +106,7 @@ class AuthService {
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('auth_token');
+    await prefs.remove('auth_role');
     await DioClient.initialize();
     LoggerService.info('[LOGOUT] Token removed from local storage.');
   }
