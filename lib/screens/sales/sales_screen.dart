@@ -145,7 +145,7 @@ class _SalesScreenState extends State<SalesScreen> {
                     Expanded(
                       child: SummaryCard(
                         title: 'Total Berat',
-                        value: '${provider.summary.totalWeight.toInt()} Kg',
+                        value: '${provider.summary.totalWeight.toInt()} kg',
                         color: Color(0xFF8B5CF6),
                         textColor: Colors.white,
                       ),
