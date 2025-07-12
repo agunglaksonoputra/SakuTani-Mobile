@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final ValueChanged<String>? onChanged;
   final String? initialValue;
   final bool isRequired;
+  final FormFieldValidator<String>? validator;
 
   const CustomTextField({
     Key? key,
@@ -17,7 +18,8 @@ class CustomTextField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.onChanged,
     this.initialValue,
-    this.isRequired = false
+    this.isRequired = false,
+    this.validator,
   }) : super(key: key);
 
   @override
@@ -54,6 +56,14 @@ class CustomTextField extends StatelessWidget {
           controller: controller,
           keyboardType: keyboardType,
           onChanged: onChanged,
+          validator: validator ?? (isRequired
+              ? (value) {
+            if (value == null || value.trim().isEmpty) {
+              return '$label tidak boleh kosong';
+            }
+            return null;
+          }
+              : null),
           inputFormatters: keyboardType == TextInputType.number
               ? [
             FilteringTextInputFormatter.allow(RegExp(r'[\d,.]')), // izinkan angka, titik, dan koma

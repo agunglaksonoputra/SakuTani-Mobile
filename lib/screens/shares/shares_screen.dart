@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/models/user_balance.dart';
+import 'package:saku_tani_mobile/components/periode_selector.dart';
 import 'package:saku_tani_mobile/providers/shares_provider.dart';
-
-import '../../components/period_selector.dart';
 import '../../components/summary_cards.dart';
-import '../../components/withdraw_transaction_item.dart';
+import '../../components/transaction_items/withdraw_transaction_item.dart';
 import '../../routes/app_routes.dart';
 
 class SharesScreen extends StatefulWidget {
@@ -120,7 +118,7 @@ class _SharesScreenState extends State<SharesScreen> {
               controller: _scrollController,
               padding: EdgeInsets.all(16),
               children: [
-                PeriodSelector(
+                PeriodeSelector(
                   selectedRange: provider.selectedDateRange,
                   onClear: provider.clearDateFilter,
                   onSelect: (range) => provider.setDateFilter(range),
@@ -172,7 +170,7 @@ class _SharesScreenState extends State<SharesScreen> {
                   )
                 else
                   ...data.map((transaction) => Padding(
-                    padding: const EdgeInsets.only(bottom: 24.0),
+                    padding: const EdgeInsets.only(bottom: 12.0),
                     child: WithdrawTransactionItem(
                       transaction: transaction,
                       onDelete: () =>

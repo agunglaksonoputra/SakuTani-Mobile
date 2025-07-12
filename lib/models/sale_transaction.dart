@@ -43,12 +43,9 @@ class SaleTransaction {
   String formatDouble(double? value) {
     if (value == null || value == 0) return '0';
 
-    // Format dengan 2 desimal dulu
-    String result = value.toStringAsFixed(2);
+    final formatter = NumberFormat("#,##0.##", "id_ID");
 
-    // Hilangkan nol di belakang koma jika tidak diperlukan (contoh: 1.50 -> 1.5, 1.00 -> 1)
-    result = result.replaceFirst(RegExp(r'\.?0+$'), '');
-    return result;
+    return formatter.format(value);
   }
 
   String formatCurrency(double? value) {
@@ -87,6 +84,7 @@ class SaleTransaction {
 
   Map<String, dynamic> toJson() {
     return {
+      'date': date != null ? DateFormat('yyyy-MM-dd').format(date!) : null,
       'customer': customerName,
       'item_name': itemName,
       'quantity': quantity,

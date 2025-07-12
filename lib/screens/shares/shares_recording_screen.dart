@@ -2,9 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/custom_text_field.dart';
-import 'package:saku_tani_mobile/components/field_selector.dart';
-import '../../components/custom_text_field_button.dart';
+import 'package:saku_tani_mobile/components/input/custom_text_field_button.dart';
+import 'package:saku_tani_mobile/components/input/field_selector.dart';
+import '../../components/input/custom_date_field.dart';
 import '../../providers/shares_record_provider.dart';
 
 class WithdrawRecordScreen extends StatefulWidget {
@@ -71,6 +71,15 @@ class _WithdrawRecordScreenState extends State<WithdrawRecordScreen> {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
+                    CustomDateField(
+                      label: "Tanggal",
+                      selectedDate: provider.selectedDate,
+                      onDateSelected: (date) {
+                        provider.selectedDate = date;
+                        provider.notifyListeners();
+                      },
+                    ),
+                    const SizedBox(height: 20),
                     FieldSelectorInput(
                       label: 'Nama',
                       controller: provider.nameController,
@@ -80,7 +89,7 @@ class _WithdrawRecordScreenState extends State<WithdrawRecordScreen> {
                       onChanged: (_) => provider.notifyListeners(),
                     ),
                     const SizedBox(height: 20),
-                    CustomTextFieldWithMax(
+                    CustomTextFieldButton(
                       label: "Jumlah",
                       controller: provider.amountController,
                       keyboardType: TextInputType.number,

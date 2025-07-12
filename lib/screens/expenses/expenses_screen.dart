@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/expenses_transaction_item.dart';
+import 'package:saku_tani_mobile/components/periode_selector.dart';
+import 'package:saku_tani_mobile/components/transaction_items/expenses_transaction_item.dart';
 import 'package:saku_tani_mobile/components/summary_cards.dart';
 import 'package:saku_tani_mobile/providers/expenses_provider.dart';
 import 'package:saku_tani_mobile/routes/app_routes.dart';
-import '../../components/period_selector.dart';
-
 
 class ExpensesScreen extends StatefulWidget {
   @override
@@ -121,7 +120,7 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
               controller: _scrollController,
               padding: EdgeInsets.all(16),
               children: [
-                PeriodSelector(
+                PeriodeSelector(
                   selectedRange: provider.selectedDateRange,
                   onClear: provider.clearDateFilter,
                   onSelect: (range) => provider.setDateFilter(range),

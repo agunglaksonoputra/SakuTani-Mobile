@@ -10,6 +10,7 @@ class SharesRecordProvider with ChangeNotifier {
   final List<UserBalance> _userBalances = [];
   bool _isLoading = false;
   String? _errorMessage;
+  DateTime? selectedDate;
 
   final TextEditingController nameController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
@@ -141,6 +142,7 @@ class SharesRecordProvider with ChangeNotifier {
   }
 
   void clearForm() {
+    selectedDate = null;
     nameController.clear();
     amountController.clear();
     notifyListeners();

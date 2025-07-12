@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:saku_tani_mobile/components/custom_text_field.dart';
-import 'package:saku_tani_mobile/components/field_selector.dart';
+import 'package:saku_tani_mobile/components/input/custom_date_field.dart';
+import 'package:saku_tani_mobile/components/input/custom_text_field.dart';
+import 'package:saku_tani_mobile/components/input/field_selector.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 
 class SalesRecordingScreen extends StatefulWidget {
@@ -13,6 +14,7 @@ class SalesRecordingScreen extends StatefulWidget {
 }
 
 class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
+  DateTime? selectedDate;
 
   @override
   void initState() {
@@ -70,12 +72,20 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
+                      CustomDateField(
+                        label: "Tanggal",
+                        selectedDate: provider.selectedDate,
+                        onDateSelected: (date) {
+                          provider.selectedDate = date;
+                          provider.notifyListeners();
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       FieldSelectorInput(
                         label: 'Pelanggan',
                         controller: provider.customerController,
                         options: provider.customerOptions,
                         isRequired: true,
-                        readOnly: false,
                       ),
                       const SizedBox(height: 20),
                       FieldSelectorInput(
@@ -83,7 +93,6 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                         controller: provider.vegetableController,
                         options: provider.vegetableOptions,
                         isRequired: true,
-                        readOnly: false,
                       ),
                       const SizedBox(height: 20),
                       Row(

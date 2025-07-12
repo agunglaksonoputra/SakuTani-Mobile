@@ -9,7 +9,6 @@ import 'package:saku_tani_mobile/providers/monthly_report_provider.dart';
 import 'package:saku_tani_mobile/providers/sales_record_provider.dart';
 import 'package:saku_tani_mobile/providers/shares_provider.dart';
 import 'package:saku_tani_mobile/providers/shares_record_provider.dart';
-import 'package:saku_tani_mobile/screens/splash_screen.dart';
 import 'package:saku_tani_mobile/services/dio_client.dart';
 import 'providers/finance_provider.dart';
 import 'providers/sales_provider.dart';

@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
-import '../../components/custom_text_field.dart';
-import '../../components/field_selector.dart';
+import 'package:saku_tani_mobile/components/input/field_selector.dart';
+import '../../components/input/custom_date_field.dart';
+import '../../components/input/custom_text_field.dart';
 import '../../providers/expenses_record_provider.dart';
 
 class ExpensesRecordScreen extends StatefulWidget {
@@ -69,6 +70,15 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                   padding: const EdgeInsets.all(16),
                   child: Column(
                     children: [
+                      CustomDateField(
+                        label: "Tanggal",
+                        selectedDate: provider.selectedDate,
+                        onDateSelected: (date) {
+                          provider.selectedDate = date;
+                          provider.notifyListeners();
+                        },
+                      ),
+                      const SizedBox(height: 20),
                       CustomTextField(
                         label: 'Nama',
                         controller: provider.nameController,
