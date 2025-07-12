@@ -105,6 +105,24 @@ class SharesProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  /// Delete transaksi dan refresh data (termasuk filter)
+  Future<void> deleteTransaction(int id) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      LoggerService.debug('[WITHDRAW] Deleting transaction ID: $id...');
+      await ShareService.softDeleteWithdrawTransaction(id);
+      await refreshData();
+      LoggerService.info('[WITHDRAW] Transaction deleted.');
+    } catch (e, st) {
+      LoggerService.error('[WITHDRAW] Failed to delete transaction.', error: e, stackTrace: st);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
+
   /// Set date range filter
   void setDateFilter(DateTimeRange range) {
     _selectedDateRange = range;

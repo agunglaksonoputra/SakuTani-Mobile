@@ -192,27 +192,48 @@ class _ExpensesScreenState extends State<ExpensesScreen> {
   void _showDeleteDialog(BuildContext context, int transactionId) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Hapus Transaksi'),
-        content: Text('Apakah Anda yakin ingin menghapus transaksi ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () {
-              Provider.of<ExpensesProvider>(context, listen: false)
-                  .deleteTransaction(transactionId);
-              Navigator.pop(context);
-            },
-            child: Text(
-              'Hapus',
-              style: TextStyle(color: Colors.red),
-            ),
-          ),
-        ],
-      ),
+      barrierDismissible: false, // agar tidak bisa ditutup manual saat loading
+      builder: (context) {
+        bool isDeleting = false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Konfirmasi'),
+              content: isDeleting
+                  ? Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  CircularProgressIndicator(),
+                  SizedBox(height: 16),
+                  Text('Menghapus transaksi...'),
+                ],
+              )
+                  : Text('Yakin ingin menghapus transaksi ini?'),
+              actions: isDeleting
+                  ? []
+                  : [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Batal'),
+                ),
+                TextButton(
+                  onPressed: () async {
+                    setState(() => isDeleting = true);
+                    await Provider.of<ExpensesProvider>(context, listen: false)
+                        .deleteTransaction(transactionId);
+                    Navigator.of(context).pop(); // Tutup dialog setelah selesai
+                  },
+                  child: Text(
+                    'Hapus',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              ],
+            );
+          },
+        );
+      },
     );
   }
 }

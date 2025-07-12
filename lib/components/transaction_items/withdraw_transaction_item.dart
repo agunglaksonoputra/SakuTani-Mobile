@@ -158,11 +158,9 @@ class WithdrawTransactionItem extends StatelessWidget {
   bool _isDeleted(DateTime? date) {
     if (date == null) return false;
     final now = DateTime.now();
-    final sevenDaysAgo = now.subtract(Duration(days: 6)); // termasuk hari ini
     final localDate = date.toLocal();
-
-    return !localDate.isAfter(now) && !localDate.isBefore(
-        DateTime(sevenDaysAgo.year, sevenDaysAgo.month, sevenDaysAgo.day)
-    );
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
   }
 }

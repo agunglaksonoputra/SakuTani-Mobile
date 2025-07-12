@@ -114,7 +114,7 @@ class SalesProvider extends ChangeNotifier {
     try {
       LoggerService.debug('[SALES] Deleting transaction ID: $id...');
       await SalesService.softDeleteSaleTransaction(id);
-      await fetchInitialData(); // langsung refresh data
+      await fetchInitialData();
       LoggerService.info('[SALES] Transaction deleted.');
     } catch (e, st) {
       LoggerService.error('[SALES] Failed to delete transaction.', error: e, stackTrace: st);
