@@ -21,67 +21,78 @@ class FieldSelectorInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _showOptionBottomSheet(context),
-      child: AbsorbPointer(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text.rich(
+    final inputField = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: label,
+            style: TextStyle(
+              fontSize: 14,
+              color: Colors.grey[700],
+              fontWeight: FontWeight.w500,
+            ),
+            children: isRequired
+                ? [
               TextSpan(
-                text: label,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey[700],
-                  fontWeight: FontWeight.w500,
-                ),
-                children: isRequired
-                    ? [
-                  TextSpan(
-                    text: ' *',
-                    style: TextStyle(color: Colors.red),
-                  )
-                ]
-                    : [],
-              ),
-            ),
-            const SizedBox(height: 8),
-            TextFormField(
-              controller: controller,
-              decoration: InputDecoration(
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Color(0xFF8B5CF6).withOpacity(0.2),
-                    width: 2.0,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Color(0xFF8B5CF6),
-                    width: 2.0,
-                  ),
-                ),
-                filled: true,
-                fillColor: Color(0xFF8B5CF6).withOpacity(0.1),
-                suffixIcon: const Icon(FontAwesomeIcons.angleDown),
-              ),
-              readOnly: readOnly,
-              validator: isRequired
-                  ? (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Harus dipilih';
-                }
-                return null;
-              }
-                  : null,
-            ),
-          ],
+                text: ' *',
+                style: TextStyle(color: Colors.red),
+              )
+            ]
+                : [],
+          ),
         ),
-      ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          readOnly: readOnly,
+          decoration: InputDecoration(
+            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Color(0xFF8B5CF6).withOpacity(0.2),
+                width: 2.0,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide(
+                color: Color(0xFF8B5CF6),
+                width: 2.0,
+              ),
+            ),
+            filled: true,
+            fillColor: Color(0xFF8B5CF6).withOpacity(0.1),
+            suffixIcon: GestureDetector(
+              onTap: () {
+                _showOptionBottomSheet(context);
+              },
+              child: const Icon(FontAwesomeIcons.angleDown),
+            ),
+          ),
+          validator: isRequired
+              ? (value) {
+            if (value == null || value.isEmpty) {
+              return 'Harus dipilih';
+            }
+            return null;
+          }
+              : null,
+        ),
+      ],
     );
+
+    // Jika readOnly, bungkus dengan GestureDetector supaya bisa pilih dari bottom sheet
+    if (readOnly) {
+      return GestureDetector(
+        onTap: () => _showOptionBottomSheet(context),
+        child: AbsorbPointer(child: inputField),
+      );
+    }
+
+    // Jika tidak readOnly, biarkan bisa diketik manual
+    return inputField;
   }
 
   void _showOptionBottomSheet(BuildContext context) {

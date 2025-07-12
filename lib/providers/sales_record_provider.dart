@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:saku_tani_mobile/models/sale_transaction.dart';
@@ -85,6 +87,7 @@ class SalesRecordProvider with ChangeNotifier {
       );
 
       LoggerService.info('[SALES] Sending transaction data to backend...');
+      LoggerService.debug('Transaction Payload: ${jsonEncode(sale.toJson())}');
       final success = await SalesService.createSalesTransaction(sale);
 
       if (success) {

@@ -94,11 +94,10 @@ class TransactionItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (onDelete != null) ...[
+                if (onDelete != null && _isToday(transaction.date)) ...[
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
-                      print('Icon delete ditekan');
                       onDelete?.call();
                     },
                     borderRadius: BorderRadius.circular(6),
@@ -197,6 +196,7 @@ class TransactionItem extends StatelessWidget {
                 _buildTableRow('Harga per Unit', transaction.formatCurrency(transaction.pricePerUnit)),
                 _buildTableRow('Total Harga', transaction.formatCurrency(transaction.totalPrice)),
                 _buildTableRow('Catatan', transaction.notes ?? ''),
+                _buildTableRow('Dibuat oleh', transaction.createdBy ?? ''),
               ],
             ),
           ),
@@ -232,4 +232,14 @@ class TransactionItem extends StatelessWidget {
       ],
     );
   }
+
+  bool _isToday(DateTime? date) {
+    if (date == null) return false;
+    final now = DateTime.now();
+    final localDate = date.toLocal();
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
+  }
+
 }

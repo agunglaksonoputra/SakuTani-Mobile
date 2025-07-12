@@ -5,21 +5,27 @@ import '../services/sales_services.dart';
 import '../services/logger_service.dart';
 
 class SalesProvider extends ChangeNotifier {
+  // Data utama
   List<SaleTransaction> _transactions = [];
   SalesSummary _summary = SalesSummary(totalSales: 0, totalWeight: 0, totalTransactions: 0);
 
+  // State
   bool _isLoading = false;
   bool _isLoadingMore = false;
+  bool _hasMore = true;
   int _page = 1;
   final int _limit = 10;
-  bool _hasMore = true;
+
+  // Filter
   DateTimeRange? _selectedDateRange;
 
   // Getters
-  List<SaleTransaction> get transactions => _transactions.where((t) => t.deletedAt == null).toList();
+  List<SaleTransaction> get transactions =>
+      _transactions.where((t) => t.deletedAt == null).toList();
 
   List<SaleTransaction> get filteredTransactions {
     if (_selectedDateRange == null) return transactions;
+
     return transactions.where((tx) {
       if (tx.date == null) return false;
       return tx.date!.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
@@ -37,14 +43,17 @@ class SalesProvider extends ChangeNotifier {
     fetchInitialData();
   }
 
+  /// Fetch awal (reset page, summary, hasMore)
   Future<void> fetchInitialData() async {
     _isLoading = true;
-    _page = 1;
-    _hasMore = true;
     notifyListeners();
 
     try {
+      _page = 1;
+      _hasMore = true;
+
       LoggerService.info('[SALES] Fetching initial sales data (page: $_page)...');
+
       final response = await SalesService.fetchSales(page: _page, limit: _limit);
 
       _transactions = response.sales;
@@ -65,13 +74,14 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Refresh data dan langsung loadMore untuk page berikutnya
   Future<void> refreshData() async {
     LoggerService.debug('[SALES] Refreshing sales data...');
     await Future.delayed(const Duration(milliseconds: 300));
     await fetchInitialData();
-    await loadMoreData();
   }
 
+  /// Load halaman berikutnya jika masih ada
   Future<void> loadMoreData() async {
     if (_isLoadingMore || !_hasMore) return;
 
@@ -88,7 +98,7 @@ class SalesProvider extends ChangeNotifier {
 
       LoggerService.info('[SALES] Loaded ${response.sales.length} more records.');
     } catch (e, st) {
-      _page--;
+      _page--; // rollback page jika error
       LoggerService.error('[SALES] Failed to load more data.', error: e, stackTrace: st);
     }
 
@@ -96,40 +106,7 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Future<void> addTransaction(SaleTransaction transaction) async {
-  //   _isLoading = true;
-  //   notifyListeners();
-  //
-  //   try {
-  //     LoggerService.debug('[SALES] Adding new transaction...');
-  //     // await SalesService.addSale(transaction);
-  //     await fetchInitialData();
-  //     LoggerService.info('[SALES] Transaction added successfully.');
-  //   } catch (e, st) {
-  //     LoggerService.error('[SALES] Failed to add transaction.', error: e, stackTrace: st);
-  //   }
-  //
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
-  //
-  // Future<void> updateTransaction(int id, SaleTransaction updatedTransaction) async {
-  //   _isLoading = true;
-  //   notifyListeners();
-  //
-  //   try {
-  //     LoggerService.debug('[SALES] Updating transaction ID: $id...');
-  //     // await SalesService.updateSale(id, updatedTransaction);
-  //     await fetchInitialData();
-  //     LoggerService.info('[SALES] Transaction updated successfully.');
-  //   } catch (e, st) {
-  //     LoggerService.error('[SALES] Failed to update transaction.', error: e, stackTrace: st);
-  //   }
-  //
-  //   _isLoading = false;
-  //   notifyListeners();
-  // }
-
+  /// Delete transaksi dan refresh data (termasuk filter)
   Future<void> deleteTransaction(int id) async {
     _isLoading = true;
     notifyListeners();
@@ -137,7 +114,7 @@ class SalesProvider extends ChangeNotifier {
     try {
       LoggerService.debug('[SALES] Deleting transaction ID: $id...');
       await SalesService.softDeleteSaleTransaction(id);
-      await fetchInitialData();
+      await fetchInitialData(); // langsung refresh data
       LoggerService.info('[SALES] Transaction deleted.');
     } catch (e, st) {
       LoggerService.error('[SALES] Failed to delete transaction.', error: e, stackTrace: st);
@@ -147,18 +124,21 @@ class SalesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Set filter tanggal
   void setDateFilter(DateTimeRange range) {
     _selectedDateRange = range;
     LoggerService.debug('[SALES] Filter set: ${range.start} to ${range.end}');
     notifyListeners();
   }
 
+  /// Hapus filter tanggal
   void clearDateFilter() {
     _selectedDateRange = null;
     LoggerService.debug('[SALES] Date filter cleared.');
     notifyListeners();
   }
 
+  /// Format tampilan rupiah
   String formatCurrency(double amount) {
     return 'Rp ${amount.toStringAsFixed(0).replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
@@ -166,6 +146,7 @@ class SalesProvider extends ChangeNotifier {
     )}';
   }
 
+  /// Format berat
   String formatWeight(double weight) {
     return '${weight.toStringAsFixed(2)} kg';
   }

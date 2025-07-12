@@ -65,11 +65,11 @@ class WithdrawTransactionItem extends StatelessWidget {
                 color: Color(0xFF1A1A1A),
               ),
             ),
-            if (onDelete != null) ...[
+
+            if (onDelete != null && _isToday(transaction.date)) ...[
               const SizedBox(width: 8),
               InkWell(
                 onTap: () {
-                  print('Icon delete ditekan');
                   onDelete?.call();
                 },
                 borderRadius: BorderRadius.circular(6),
@@ -139,5 +139,14 @@ class WithdrawTransactionItem extends StatelessWidget {
         // ],
       ],
     );
+  }
+
+  bool _isToday(DateTime? date) {
+    if (date == null) return false;
+    final now = DateTime.now();
+    final localDate = date.toLocal();
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
   }
 }

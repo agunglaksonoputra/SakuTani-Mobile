@@ -12,6 +12,7 @@ class SaleTransaction {
   final double? pricePerUnit;
   final double? totalPrice;
   final String? notes;
+  final String? createdBy;
   final DateTime? createdAt;
   final DateTime? updatedAt;
   final DateTime? deletedAt;
@@ -28,6 +29,7 @@ class SaleTransaction {
     this.pricePerUnit,
     this.totalPrice,
     this.notes,
+    this.createdBy,
     this.createdAt,
     this.updatedAt,
     this.deletedAt,
@@ -76,6 +78,7 @@ class SaleTransaction {
       pricePerUnit: double.tryParse(json['price_per_unit']),
       totalPrice: double.tryParse(json['total_price']),
       notes: json['notes'],
+      createdBy: json['created_by'],
       createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
       updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
       deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,

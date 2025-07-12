@@ -75,6 +75,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                         controller: provider.customerController,
                         options: provider.customerOptions,
                         isRequired: true,
+                        readOnly: false,
                       ),
                       const SizedBox(height: 20),
                       FieldSelectorInput(
@@ -82,6 +83,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                         controller: provider.vegetableController,
                         options: provider.vegetableOptions,
                         isRequired: true,
+                        readOnly: false,
                       ),
                       const SizedBox(height: 20),
                       Row(
@@ -151,7 +153,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Total Harga',
                               controller: provider.totalPriceController,
-                              // keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.number,
                               isRequired: true,
                             ),
                           ),

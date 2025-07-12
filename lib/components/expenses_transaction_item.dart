@@ -84,7 +84,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (onDelete != null) ...[
+                if (onDelete != null && _isToday(transaction.date)) ...[
                   SizedBox(width: 8),
                   InkWell(
                     onTap: () {
@@ -198,6 +198,15 @@ class ExpensesTransactionItem extends StatelessWidget {
         ),
       ],
     );
+  }
+
+  bool _isToday(DateTime? date) {
+    if (date == null) return false;
+    final now = DateTime.now();
+    final localDate = date.toLocal();
+    return localDate.year == now.year &&
+        localDate.month == now.month &&
+        localDate.day == now.day;
   }
 
 }
