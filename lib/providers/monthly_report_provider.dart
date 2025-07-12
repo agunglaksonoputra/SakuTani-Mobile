@@ -112,6 +112,29 @@ class MonthlyReportProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> downloadExcelFile(BuildContext context) async {
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final filePath = await MonthlyReportServices.downloadExcelReport();
+
+      LoggerService.info('[PROVIDER] Report file successfully saved at $filePath');
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Report successfully downloaded to: $filePath')),
+      );
+    } catch (e) {
+      LoggerService.error('[PROVIDER] Failed to download report file', error: e);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to download report: $e')),
+      );
+    }
+
+    _isLoading = false;
+    notifyListeners();
+  }
 
   Future<void> refreshData() async {
     await fetchInitialData();

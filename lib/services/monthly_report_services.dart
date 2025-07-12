@@ -1,6 +1,9 @@
+import 'dart:io';
+import 'package:dio/dio.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:saku_tani_mobile/models/monthly_combine_response.dart';
 import 'package:saku_tani_mobile/models/monthly_report_response.dart';
-
 import 'dio_client.dart';
 import 'logger_service.dart';
 
@@ -33,4 +36,38 @@ class MonthlyReportServices {
       rethrow;
     }
   }
+
+  static Future<String> downloadExcelReport() async {
+    try {
+      // Tentukan direktori /Download secara langsung
+      Directory directory;
+
+      if (Platform.isAndroid) {
+        directory = Directory('/storage/emulated/0/Download');
+      } else {
+        directory = await getApplicationDocumentsDirectory(); // untuk iOS
+      }
+
+      final now = DateTime.now();
+      final filename = 'Laporan Bisnis Sayur ${now.year}-${now.month.toString().padLeft(2, '0')}.xlsx';
+      final filePath = '${directory.path}/$filename';
+
+      final response = await DioClient.dio.get<List<int>>(
+        '/excel/export',
+        options: Options(
+          responseType: ResponseType.bytes,
+        ),
+      );
+
+      final file = File(filePath);
+      await file.writeAsBytes(response.data!);
+
+      LoggerService.info('[SERVICE] Report file successfully saved at: $filePath');
+      return filePath;
+    } catch (e, stackTrace) {
+      LoggerService.error('[SERVICE] Failed to download report file', error: e, stackTrace: stackTrace);
+      throw Exception("Failed to download report: $e");
+    }
+  }
+
 }
