@@ -24,7 +24,7 @@ jobs:
       - name: 🛠️ Generate .env.prod file
         run: echo "${{ secrets.ENV_DEV }}" > .env.prod
 
-      - name: 📦 Build APK (Flavor: prod)
+      - name: 📦 Build APK
         run: flutter build apk --flavor prod -t lib/main_prod.dart
 
       - name: ⬆️ Upload APK Artifact
