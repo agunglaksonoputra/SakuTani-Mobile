@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../components/cashflow_chart.dart';
 import '../components/finance_card.dart';
-import '../components/monthly_breakdown.dart';
 import '../components/profit_share_list.dart';
 import '../components/shortcut_grid.dart';
 import '../providers/finance_provider.dart';
@@ -30,7 +29,7 @@ class _HomeScreenState extends State<HomeScreen> {
         preferredSize: const Size.fromHeight(70),
         child: AppBar(
           backgroundColor: Colors.white,
-          elevation: 1,
+          elevation: 0,
           automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Align(
@@ -61,22 +60,28 @@ class _HomeScreenState extends State<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Finance Cards Grid
-                  GridView.builder(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                      crossAxisCount: 2,
-                      childAspectRatio: 1.5,
-                      crossAxisSpacing: 12.0,
-                      mainAxisSpacing: 12.0,
-                    ),
-                    itemCount: provider.financeCards.length,
-                    itemBuilder: (context, index) {
-                      return FinanceCard(
-                        data: provider.financeCards[index],
-                      );
-                    },
+                  // Summary Month
+                  Column(
+                    children: [
+                      Container(
+                        width: double.infinity,
+                        child:  FinanceCard(data: provider.financeCards[0]),
+                      ),
+
+                      const SizedBox(height: 12),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: FinanceCard(data: provider.financeCards[1]),
+                          ),
+                          const SizedBox(width: 12), // jarak antar kartu
+                          Expanded(
+                            child: FinanceCard(data: provider.financeCards[2]),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
 
                   const SizedBox(height: 24.0),
@@ -85,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Text(
                     'Pintasan',
                     style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -98,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Text(
                     'Bagi Hasil',
                     style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -109,9 +114,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
                   // Cashflow Chart
                   const Text(
-                    'Proyeksi Cashflow 30 Hari',
+                    'Proyeksi Cashflow',
                     style: TextStyle(
-                      fontSize: 18.0,
+                      fontSize: 16.0,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

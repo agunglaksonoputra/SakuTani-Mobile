@@ -9,7 +9,9 @@ import '../routes/app_routes.dart';
 final String baseUrl = (() {
   final emulator = dotenv.env['BASE_URL_EMULATOR'];
   final device = dotenv.env['BASE_URL_DEVICE'];
-  final selected = emulator ?? device ?? '';
+  final test = dotenv.env['BASE_URL_TEST'];
+  final production =  dotenv.env['BASE_URL'];
+  final selected = emulator ?? device ?? test ?? production ??  '';
   return selected.endsWith('/') ? selected : '$selected/';
 })();
 

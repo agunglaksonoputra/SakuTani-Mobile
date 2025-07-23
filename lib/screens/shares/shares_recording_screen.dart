@@ -37,7 +37,7 @@ class _WithdrawRecordScreenState extends State<WithdrawRecordScreen> {
               preferredSize: Size.fromHeight(60),
               child: AppBar(
                 backgroundColor: Colors.white,
-                elevation: 1,
+                elevation: 0,
                 automaticallyImplyLeading: false,
                 flexibleSpace: SafeArea(
                   child: Center(
@@ -92,7 +92,7 @@ class _WithdrawRecordScreenState extends State<WithdrawRecordScreen> {
                     CustomTextFieldButton(
                       label: "Jumlah",
                       controller: provider.amountController,
-                      keyboardType: TextInputType.number,
+                      keyboardType: TextInputType.numberWithOptions(decimal: true),
                       maxValue: provider.selectedUserBalance?.balance ?? 0.0,
                       userBalance: provider.selectedUserBalance?.balance ?? 0.0,
                       isRequired: true,

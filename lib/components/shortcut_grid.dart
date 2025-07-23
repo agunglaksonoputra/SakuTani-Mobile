@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/providers/finance_provider.dart';
-import 'package:saku_tani_mobile/providers/monthly_report_provider.dart';
 import 'package:saku_tani_mobile/routes/app_routes.dart';
 import '../screens/sales/sales_screen.dart';
 
@@ -76,7 +75,7 @@ class ShortcutGrid extends StatelessWidget {
                 child: Icon(
                   shortcut['icon'],
                   color: shortcut['color'],
-                  size: 24.0,
+                  size: 20.0,
                 ),
               ),
               SizedBox(height: 8.0),

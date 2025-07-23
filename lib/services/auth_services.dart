@@ -6,7 +6,7 @@ import 'logger_service.dart';
 
 class AuthService {
   /// Login user dan simpan token
-  static Future<String> login(String username, String password) async {
+  static Future<Map<String, dynamic>> login(String username, String password) async {
     try {
       final response = await DioClient.dio.post('/auth/login/', data: {
         'username': username,
@@ -23,13 +23,16 @@ class AuthService {
         await prefs.setString('auth_role', role);
         await DioClient.initialize();
 
-        LoggerService.info('[LOGIN] Login successful. Token stored.');
+        LoggerService.info('[LOGIN] Login successful. Token and role stored.');
 
-        return token;
+        return {
+          'token': token,
+          'role': role,
+        };
       } else {
         final message = data['message'] ?? 'Unknown error';
         LoggerService.warning('[LOGIN] Login failed: $message');
-        throw Exception("Login gagal: ${data['message'] ?? 'Unknown error'}");
+        throw Exception("Login gagal: $message");
       }
     } on DioException catch (e, stackTrace) {
       final errorMessage = e.response?.data['message'] ?? e.message;
@@ -56,7 +59,7 @@ class AuthService {
 
         LoggerService.warning('[REGISTER] Registration failed: $msg');
 
-        throw Exception("Register gagal: ${data['message']}");
+        throw Exception("Registration failed: ${data['message']}");
       }
 
       LoggerService.info('[REGISTER] User registered successfully.');

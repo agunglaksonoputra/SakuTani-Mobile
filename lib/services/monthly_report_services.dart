@@ -4,6 +4,8 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:saku_tani_mobile/models/monthly_combine_response.dart';
 import 'package:saku_tani_mobile/models/monthly_report_response.dart';
+import 'package:saku_tani_mobile/models/monthly_report_summary.dart';
+import '../helper/permission_handler.dart';
 import 'dio_client.dart';
 import 'logger_service.dart';
 
@@ -39,7 +41,10 @@ class MonthlyReportServices {
 
   static Future<String> downloadExcelReport() async {
     try {
-      // Tentukan direktori /Download secara langsung
+      // ✅ Minta izin storage (Android 11+ dan di bawahnya)
+      await requestStoragePermissions();
+
+      // ✅ Tentukan direktori /Download
       Directory directory;
 
       if (Platform.isAndroid) {
@@ -52,6 +57,7 @@ class MonthlyReportServices {
       final filename = 'Laporan Bisnis Sayur ${now.year}-${now.month.toString().padLeft(2, '0')}.xlsx';
       final filePath = '${directory.path}/$filename';
 
+      // ✅ Ambil data dari API
       final response = await DioClient.dio.get<List<int>>(
         '/excel/export',
         options: Options(
@@ -59,6 +65,7 @@ class MonthlyReportServices {
         ),
       );
 
+      // ✅ Tulis ke file
       final file = File(filePath);
       await file.writeAsBytes(response.data!);
 
@@ -67,6 +74,18 @@ class MonthlyReportServices {
     } catch (e, stackTrace) {
       LoggerService.error('[SERVICE] Failed to download report file', error: e, stackTrace: stackTrace);
       throw Exception("Failed to download report: $e");
+    }
+  }
+
+  static Future<MonthlyReportSummary> fetchMonthlySummary() async {
+    try {
+      final res = await DioClient.dio.get('v2/report/summary');
+      final data = res.data;
+      LoggerService.info('[FINANCE] Fetched monthly report summary');
+      return MonthlyReportSummary.fromJson(data);
+    } catch (e) {
+      LoggerService.error('[FINANCE] Failed to fetch monthly report summary', error: e);
+      throw Exception("Failed to load monthly report summary: $e");
     }
   }
 

@@ -34,7 +34,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
             preferredSize: Size.fromHeight(60),
             child: AppBar(
               backgroundColor: Colors.white,
-              elevation: 1,
+              elevation: 0,
               automaticallyImplyLeading: false,
               flexibleSpace: SafeArea(
                 child: Center(
@@ -91,7 +91,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Jumlah (pcs)',
                               controller: provider.quantityController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               // onChanged: (value) {
                               //   provider.totalPriceController.text =
                               //       provider.totalPriceCount.truncate().toString();
@@ -119,7 +119,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Harga Satuan',
                               controller: provider.pricePerUnitController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               // onChanged: (value) {
                               //   provider.totalPriceController.text =
                               //       provider.totalPriceCount.truncate().toString();
@@ -147,7 +147,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Harga Ongkir',
                               controller: provider.shippingCostController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               // onChanged: (value) {
                               //   provider.totalPriceController.text =
                               //       provider.totalPriceCount.truncate().toString();
@@ -159,7 +159,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Harga Diskon',
                               controller: provider.discountController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               // onChanged: (value) {
                               //   provider.totalPriceController.text =
                               //       provider.totalPriceCount.truncate().toString();
@@ -180,7 +180,7 @@ class _ExpensesRecordingScreenState extends State<ExpensesRecordScreen> {
                             child: CustomTextField(
                               label: 'Total Harga',
                               controller: provider.totalAmountController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               isRequired: true,
                             ),
                           ),

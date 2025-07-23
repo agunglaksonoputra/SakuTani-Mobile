@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:saku_tani_mobile/models/withdraw_log.dart';
 import 'package:saku_tani_mobile/models/withdraw_response.dart';
 import '../models/user_balance.dart';
 import '../services/data_master_service.dart';
@@ -68,8 +69,8 @@ class SharesRecordProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final withdraw = WithdrawResponse(
-        name: nameController.text,
+      final withdraw = WithdrawLog(
+        userName: nameController.text,
         amount: parseNumber(amountController.text),
       );
 

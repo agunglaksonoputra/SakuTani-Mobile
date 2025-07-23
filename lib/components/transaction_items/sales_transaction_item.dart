@@ -5,17 +5,17 @@ import '../../models/sale_transaction.dart';
 class SalesTransactionItem extends StatelessWidget {
   final SaleTransaction transaction;
   final VoidCallback? onDelete;
+  final bool canDelete;
 
   const SalesTransactionItem({
     Key? key,
     required this.transaction,
     this.onDelete,
+    this.canDelete = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    // final salesProvider = Provider.of<SalesProvider>(context, listen: false);
-
     return InkWell(
       onTap: () => _showDetailDialog(context),
       borderRadius: BorderRadius.circular(12),
@@ -46,7 +46,7 @@ class SalesTransactionItem extends StatelessWidget {
                   child: Icon(
                     FontAwesomeIcons.cartShopping,
                     color: Colors.white,
-                    size: 20,
+                    size: 14,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -57,7 +57,7 @@ class SalesTransactionItem extends StatelessWidget {
                       Text(
                         transaction.customerName ?? 'Pelanggan',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1A1A1A),
                         ),
@@ -79,7 +79,7 @@ class SalesTransactionItem extends StatelessWidget {
                     Text(
                       '${transaction.formatCurrency(transaction.totalPrice)}',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1A1A1A),
                       ),
@@ -94,7 +94,7 @@ class SalesTransactionItem extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (onDelete != null && _isDeleted(transaction.date)) ...[
+                if (canDelete && onDelete != null && _isDeleted(transaction.date)) ...[
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
@@ -109,7 +109,7 @@ class SalesTransactionItem extends StatelessWidget {
                       ),
                       child: Icon(
                         FontAwesomeIcons.trashCan,
-                        size: 16,
+                        size: 14,
                         color: Color(0xFFEF4444),
                       ),
                     ),
@@ -123,7 +123,7 @@ class SalesTransactionItem extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.inventory_2_outlined,
-                    size: 16,
+                    size: 14,
                     color: Color(0xFF6B7280),
                   ),
                   const SizedBox(width: 8),
@@ -131,7 +131,7 @@ class SalesTransactionItem extends StatelessWidget {
                     child: Text(
                       transaction.itemName!,
                       style: TextStyle(
-                        fontSize: 14,
+                        fontSize: 12,
                         color: Color(0xFF4B5563),
                       ),
                     ),
@@ -146,7 +146,7 @@ class SalesTransactionItem extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.note_outlined,
-                    size: 16,
+                    size: 14,
                     color: Color(0xFF6B7280),
                   ),
                   const SizedBox(width: 8),
@@ -182,8 +182,8 @@ class SalesTransactionItem extends StatelessWidget {
           child: SingleChildScrollView(
             child: Table(
               columnWidths: const {
-                0: IntrinsicColumnWidth(),
-                1: FixedColumnWidth(2),
+                0: FlexColumnWidth(),
+                1: FixedColumnWidth(4),
                 2: FlexColumnWidth(),
               },
               children: [

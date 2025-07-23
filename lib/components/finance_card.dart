@@ -23,7 +23,7 @@ class FinanceCard extends StatelessWidget {
             'Rp ${_formatNumber(data.amount)}',
             style: TextStyle(
               color: Colors.white,
-              fontSize: 20.0,
+              fontSize: 14.0,
               fontWeight: FontWeight.bold,
             ),
           ),
@@ -32,7 +32,7 @@ class FinanceCard extends StatelessWidget {
             data.title,
             style: TextStyle(
               color: Colors.white.withOpacity(0.9),
-              fontSize: 14.0,
+              fontSize: 12.0,
               fontWeight: FontWeight.w500
             ),
           ),

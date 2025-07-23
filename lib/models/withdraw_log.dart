@@ -1,28 +1,50 @@
+import 'package:intl/intl.dart';
+
 class WithdrawLog {
-  final String id;
-  final String userName;
-  final double amount;
-  final String notes;
-  final DateTime createdAt;
-  final DateTime updatedAt;
+  final int? id;
+  final String? userName;
+  final double? amount;
+  final DateTime? date;
+  // final String notes;
 
   WithdrawLog({
-    required this.id,
-    required this.userName,
-    required this.amount,
-    required this.notes,
-    required this.createdAt,
-    required this.updatedAt,
+    this.id,
+    this.userName,
+    this.amount,
+    this.date,
+    // required this.notes,
   });
+
+  String get formattedDate {
+    if (date == null) return '-';
+    return DateFormat('d MMMM yyyy', 'id_ID').format(date!);
+  }
+
+  String formatCurrency(double? value) {
+    final formatter = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp ',
+      decimalDigits: 0,
+    );
+    return formatter.format(value ?? 0);
+  }
 
   factory WithdrawLog.fromJson(Map<String, dynamic> json) {
     return WithdrawLog(
       id: json['id'],
-      userName: json['user_name'],
-      amount: json['amount'].toDouble(),
-      notes: json['notes'],
-      createdAt: DateTime.parse(json['createdAt']),
-      updatedAt: DateTime.parse(json['updatedAt']),
+      userName: json['name'],
+      amount: double.tryParse(json['amount'].toString()) ?? 0.0,
+      date: json['date'] != null ? DateTime.parse(json['date']) : null,
+      // notes: json['notes'],
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': userName,
+      'amount': amount,
+      // 'notes': notes,
+    };
   }
 }

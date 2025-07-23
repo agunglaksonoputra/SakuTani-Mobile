@@ -20,27 +20,30 @@ class ExpensesProvider extends ChangeNotifier {
   bool get hasMore => _hasMore;
   DateTimeRange? get selectedDateRange => _selectedDateRange;
 
-  List<ExpensesTransaction> get filteredTransactions {
-    if (_selectedDateRange == null) return transactions;
-    return transactions.where((tx) {
-      final date = tx.date;
-      if (date == null) return false;
-      return date.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
-          date.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
-    }).toList();
-  }
+  // List<ExpensesTransaction> get filteredTransactions {
+  //   if (_selectedDateRange == null) return transactions;
+  //   return transactions.where((tx) {
+  //     final date = tx.date;
+  //     if (date == null) return false;
+  //     return date.isAfter(_selectedDateRange!.start.subtract(const Duration(days: 1))) &&
+  //         date.isBefore(_selectedDateRange!.end.add(const Duration(days: 1)));
+  //   }).toList();
+  // }
 
   Future<void> fetchInitialData() async {
     _isLoading = true;
-    _page = 1;
-    _hasMore = true;
     notifyListeners();
 
     try {
+      _page = 1;
+      _hasMore = true;
+
       LoggerService.debug('[EXPENSES] Fetching initial data...');
       final response = await ExpensesServices.fetchExpenses(page: _page, limit: _limit);
+
       _transactions = response.expenses;
       _hasMore = response.expenses.length >= _limit;
+
       _summary = {'totalAmount': response.totalAmount};
 
       LoggerService.info('[EXPENSES] Initial data fetched successfully. '
@@ -55,9 +58,43 @@ class ExpensesProvider extends ChangeNotifier {
 
   Future<void> refreshData() async {
     LoggerService.debug('[EXPENSES] Refreshing data...');
-    await fetchInitialData();
-    await Future.delayed(const Duration(milliseconds: 100));
-    await loadMoreData();
+    await Future.delayed(const Duration(milliseconds: 300));
+
+    if (_selectedDateRange != null) {
+      await fetchFilteredData(_selectedDateRange!);
+    } else {
+      await fetchInitialData();
+    }
+  }
+
+  Future<void> loadMoreData() async {
+    if (_isLoadingMore || !_hasMore) return;
+
+    _isLoadingMore = true;
+    notifyListeners();
+
+    try {
+      _page++;
+      LoggerService.debug('[EXPENSES] Loading more data (page $_page)...');
+
+      final response = await ExpensesServices.fetchExpenses(
+        page: _page,
+        limit: _limit,
+        startDate: _selectedDateRange?.start,
+        endDate: _selectedDateRange?.end,
+      );
+
+      _transactions.addAll(response.expenses);
+      _hasMore = response.expenses.length >= _limit;
+
+      LoggerService.info('[EXPENSES] Loaded more data. Total now: ${_transactions.length}');
+    } catch (e, st) {
+      _page--;
+      LoggerService.error('[EXPENSES] Failed to load more data.', error: e, stackTrace: st);
+    }
+
+    _isLoadingMore = false;
+    notifyListeners();
   }
 
   Future<void> deleteTransaction(int id) async {
@@ -77,39 +114,47 @@ class ExpensesProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> loadMoreData() async {
-    if (_isLoadingMore || !_hasMore) return;
+  void setDateFilter(DateTimeRange range) async {
+    _selectedDateRange = range;
+    LoggerService.debug('[EXPENSES] Date filter set: $range');
+    await fetchFilteredData(range);
+  }
 
-    _isLoadingMore = true;
+  Future<void> fetchFilteredData(DateTimeRange range) async {
+    _isLoading = true;
     notifyListeners();
 
     try {
-      _page++;
-      LoggerService.debug('[EXPENSES] Loading more data (page $_page)...');
-      final response = await ExpensesServices.fetchExpenses(page: _page, limit: _limit);
-      _transactions.addAll(response.expenses);
+      _page = 1;
+      _hasMore = true;
+
+      LoggerService.debug('[EXPENSES] Fetching filtered data from ${range.start} to ${range.end}...');
+
+      final response = await ExpensesServices.fetchExpenses(
+        page: _page,
+        limit: _limit,
+        startDate: range.start,
+        endDate: range.end,
+      );
+
+      _transactions = response.expenses;
       _hasMore = response.expenses.length >= _limit;
 
-      LoggerService.info('[EXPENSES] Loaded more data. Total now: ${_transactions.length}');
+      _summary = {'totalAmount': response.totalAmount};
+
+      LoggerService.info('[EXPENSES] Fetched ${response.expenses.length} filtered records.');
     } catch (e, st) {
-      _page--;
-      LoggerService.error('[EXPENSES] Failed to load more data.', error: e, stackTrace: st);
+      LoggerService.error('[EXPENSES] Failed to fetch filtered data.', error: e, stackTrace: st);
     }
 
-    _isLoadingMore = false;
+    _isLoading = false;
     notifyListeners();
   }
 
-  void setDateFilter(DateTimeRange range) {
-    _selectedDateRange = range;
-    LoggerService.debug('[EXPENSES] Date filter set: $range');
-    notifyListeners();
-  }
-
-  void clearDateFilter() {
+  Future<void> clearDateFilter() async {
     _selectedDateRange = null;
     LoggerService.debug('[EXPENSES] Date filter cleared.');
-    notifyListeners();
+    await fetchInitialData();
   }
 
   String formatCurrency(double amount) {

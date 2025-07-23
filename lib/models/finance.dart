@@ -35,23 +35,26 @@ class CashflowData {
   });
 }
 
-class WeeklySummary {
-  final String weekEnd;
+class MonthlySummary {
+  final DateTime date;
   final double totalSales;
   final double totalExpenses;
 
-  WeeklySummary({
-    required this.weekEnd,
+  MonthlySummary({
+    required this.date,
     required this.totalSales,
     required this.totalExpenses,
   });
 
-  factory WeeklySummary.fromJson(Map<String, dynamic> json) {
-    return WeeklySummary(
-      weekEnd: json['date'],
-      totalSales: (json['sales_total'] as num).toDouble(),
-      totalExpenses: (json['expenses_total'] as num).toDouble(),
+  factory MonthlySummary.fromJson(Map<String, dynamic> json) {
+    return MonthlySummary(
+      date: DateTime.parse(json['date']), // fix: parse dari String ke DateTime
+      totalSales: double.tryParse(json['total_sales'].toString()) ?? 0,
+      totalExpenses: double.tryParse(json['total_expenses'].toString()) ?? 0,
     );
   }
 }
+
+
+
 
