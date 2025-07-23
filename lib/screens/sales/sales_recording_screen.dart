@@ -36,7 +36,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
             preferredSize: Size.fromHeight(60),
             child: AppBar(
               backgroundColor: Colors.white,
-              elevation: 1,
+              elevation: 0,
               automaticallyImplyLeading: false,
               flexibleSpace: SafeArea(
                 child: Center(
@@ -101,7 +101,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Jumlah (pcs)',
                               controller: provider.quantityController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               onChanged: (value) {
                                 provider.totalPriceController.text =
                                     provider.formatDecimal(provider.totalPriceCount);
@@ -129,7 +129,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Harga Satuan',
                               controller: provider.pricePerUnitController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               onChanged: (value) {
                                 provider.totalPriceController.text =
                                   provider.formatDecimal(provider.totalPriceCount);
@@ -141,7 +141,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Berat per Satuan (gram)',
                               controller: provider.weightPerUnitController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               onChanged: (value) {
                                 provider.totalWeightPerKgController.text =
                                   provider.formatDecimal(provider.totalWeightKgCount);
@@ -162,7 +162,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Total Harga',
                               controller: provider.totalPriceController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               isRequired: true,
                             ),
                           ),
@@ -171,7 +171,7 @@ class _SalesRecordingScreenState extends State<SalesRecordingScreen> {
                             child: CustomTextField(
                               label: 'Jumlah (kg)',
                               controller: provider.totalWeightPerKgController,
-                              keyboardType: TextInputType.number,
+                              keyboardType: TextInputType.numberWithOptions(decimal: true),
                               isRequired: true,
                             ),
                           ),

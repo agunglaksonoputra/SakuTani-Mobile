@@ -1,39 +1,16 @@
 import 'package:intl/intl.dart';
+import 'package:saku_tani_mobile/models/withdraw_log.dart';
 
 class WithdrawResponse {
-  final int? id;
-  final String? name;
-  final double? amount;
-  final DateTime? date;
-  final DateTime? createdAt;
-  final DateTime? updatedAt;
-  final DateTime? deletedAt;
+  final String? month;
+  final double? totalAmount;
+  final List<WithdrawLog>? withdrawLog;
 
   WithdrawResponse({
-    this.id,
-    this.name,
-    this.amount,
-    this.date,
-    this.createdAt,
-    this.updatedAt,
-    this.deletedAt,
+    this.month,
+    this.totalAmount,
+    this.withdrawLog
   });
-
-  String get formattedDate {
-    if (date == null) return '-';
-    return DateFormat('d MMMM yyyy', 'id_ID').format(date!);
-  }
-
-  String formatDouble(double? value) {
-    if (value == null || value == 0) return '0';
-
-    // Format dengan 2 desimal dulu
-    String result = value.toStringAsFixed(2);
-
-    // Hilangkan nol di belakang koma jika tidak diperlukan (contoh: 1.50 -> 1.5, 1.00 -> 1)
-    result = result.replaceFirst(RegExp(r'\.?0+$'), '');
-    return result;
-  }
 
   String formatCurrency(double? value) {
     final formatter = NumberFormat.currency(
@@ -44,27 +21,27 @@ class WithdrawResponse {
     return formatter.format(value ?? 0);
   }
 
-  static String _capitalize(String? value) {
-    if (value == null || value.isEmpty) return '-';
-    return value[0].toUpperCase() + value.substring(1);
+  String get formattedDate {
+    if (month == null) return '-';
+    DateTime parsedDate = DateTime.parse("${month!}-01");
+    String formatted = DateFormat("MMMM yyyy", 'id_ID').format(parsedDate);
+    return formatted;
   }
 
   factory WithdrawResponse.fromJson(Map<String, dynamic> json) {
     return WithdrawResponse(
-      id: json['id'],
-      name: json['name'],
-      amount: double.tryParse(json['amount']),
-      date: json['date'] != null ? DateTime.parse(json['date']) : null,
-      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
-      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
-      deletedAt: json['deletedAt'] != null ? DateTime.parse(json['deletedAt']) : null,
+      month: json['month'],
+      totalAmount: double.tryParse(json['totalAmount']),
+      withdrawLog: (json['data'] as List)
+          .map((item) => WithdrawLog.fromJson(item))
+          .toList(),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'name': name,
-      'amount': amount,
-    };
-  }
+  // Map<String, dynamic> toJson() {
+  //   return {
+  //     'name': name,
+  //     'amount': amount,
+  //   };
+  // }
 }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'home_screen.dart';
-import '../components/reports_screen.dart';
+import 'reports_screen.dart';
 import 'settings_screen.dart';
 
 class MainScreen extends StatefulWidget {
@@ -23,15 +24,26 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _screens[_currentIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
-        selectedItemColor: Colors.green[700],
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.assessment), label: 'Reports'),
-          BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Settings'),
-        ],
+      bottomNavigationBar: SizedBox(
+        height: 80, // Atur tinggi sesuai keinginan
+        child: BottomNavigationBar(
+          currentIndex: _currentIndex,
+          onTap: (index) => setState(() => _currentIndex = index),
+          selectedItemColor: Colors.green[700],
+          type: BottomNavigationBarType.fixed,
+          selectedFontSize: 12,
+          unselectedFontSize: 12,
+          items: const [
+            BottomNavigationBarItem(
+                icon: Icon(FontAwesomeIcons.house, size: 20), label: 'Home'),
+            BottomNavigationBarItem(
+                icon: Icon(FontAwesomeIcons.squarePollVertical, size: 20),
+                label: 'Reports'),
+            BottomNavigationBarItem(
+                icon: Icon(FontAwesomeIcons.gear, size: 20),
+                label: 'Settings'),
+          ],
+        ),
       ),
     );
   }

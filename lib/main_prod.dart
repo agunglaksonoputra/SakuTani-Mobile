@@ -16,7 +16,7 @@ import 'routes/app_routes.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  await dotenv.load(fileName: ".env.prod");
   await initializeDateFormatting('id_ID', null);
   runApp(const MainApp());
 

@@ -17,17 +17,18 @@ class SharesProvider with ChangeNotifier {
   DateTimeRange? _selectedDateRange;
 
   // Getters
-  List<WithdrawResponse> get transactions =>
-      _withdrawLog.where((t) => t.deletedAt == null).toList();
+  // List<WithdrawResponse> get transactions =>
+  //     _withdrawLog.where((t) => t.deletedAt == null).toList();
+  List<WithdrawResponse> get transactions => _withdrawLog;
 
-  List<WithdrawResponse> get filteredTransactions {
-    if (_selectedDateRange == null) return transactions;
-    return transactions.where((tx) {
-      if (tx.date == null) return false;
-      return tx.date!.isAfter(_selectedDateRange!.start.subtract(Duration(days: 1))) &&
-          tx.date!.isBefore(_selectedDateRange!.end.add(Duration(days: 1)));
-    }).toList();
-  }
+  // List<WithdrawResponse> get filteredTransactions {
+  //   if (_selectedDateRange == null) return transactions;
+  //   return transactions.where((tx) {
+  //     if (tx.date == null) return false;
+  //     return tx.date!.isAfter(_selectedDateRange!.start.subtract(Duration(days: 1))) &&
+  //         tx.date!.isBefore(_selectedDateRange!.end.add(Duration(days: 1)));
+  //   }).toList();
+  // }
 
   bool get isLoading => _isLoading;
   bool get isLoadingMore => _isLoadingMore;

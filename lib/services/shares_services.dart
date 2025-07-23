@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:saku_tani_mobile/models/user_balance.dart';
+import 'package:saku_tani_mobile/models/withdraw_log.dart';
 import 'package:saku_tani_mobile/models/withdraw_response.dart';
 import 'dio_client.dart';
 import 'logger_service.dart';
@@ -13,7 +14,7 @@ class ShareService {
       final res = await DioClient.dio.get('/user-balance');
 
       if (res.statusCode == 200) {
-        final List<dynamic> data = res.data;
+        final List<dynamic> data = res.data['data'];
         LoggerService.debug('Successfully fetched ${data.length} user balances.');
         return data.map((item) => UserBalance.fromJson(item)).toList();
       } else {
@@ -31,21 +32,17 @@ class ShareService {
   static Future<List<WithdrawResponse>> getWithdrawLog({
     int page = 1,
     int limit = 10,
-    DateTime? startDate,
-    DateTime? endDate,
   }) async {
     final queryParams = {
       'page': page.toString(),
       'limit': limit.toString(),
-      if (startDate != null) 'startDate': startDate.toIso8601String().split('T').first,
-      if (endDate != null) 'endDate': endDate.toIso8601String().split('T').first,
     };
 
     try {
       LoggerService.debug("Fetching withdraw logs with query: $queryParams");
 
       final res = await DioClient.dio.get(
-          '/withdraw',
+          '/withdraw/all',
           queryParameters: queryParams
       );
 
@@ -70,7 +67,7 @@ class ShareService {
     }
   }
 
-  static Future<bool> createWithdrawTransaction(WithdrawResponse transaction) async {
+  static Future<bool> createWithdrawTransaction(WithdrawLog transaction) async {
     final dio = DioClient.dio;
 
     try {

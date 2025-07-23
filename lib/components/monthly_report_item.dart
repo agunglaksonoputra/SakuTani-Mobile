@@ -49,8 +49,8 @@ class MonthlyReportItem extends StatelessWidget {
               child: Row(
                 children: [
                   Container(
-                    width: 40,
-                    height: 40,
+                    width: 30,
+                    height: 30,
                     decoration: BoxDecoration(
                       color: Color(0xFF10B981),
                       borderRadius: BorderRadius.circular(8),
@@ -58,14 +58,14 @@ class MonthlyReportItem extends StatelessWidget {
                     child: Icon(
                       FontAwesomeIcons.calendarCheck,
                       color: Colors.white,
-                      size: 20,
+                      size: 16,
                     ),
                   ),
                   const SizedBox(width: 12),
                   Text(
                     monthlyReports.formattedDate,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
                     ),
@@ -87,7 +87,7 @@ class MonthlyReportItem extends StatelessWidget {
                 Text(
                   '${monthlyReports.formatCurrency(monthlyReports.totalSales)}',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1A1A1A),
                   ),

@@ -29,8 +29,18 @@ class ExpensesServices {
         queryParameters: queryParams,
       );
 
+      final data = response.data;
+      final List<dynamic> rawSales = data['data'] ?? [];
+      final List<ExpensesTransaction> expenses =
+      rawSales.map((e) => ExpensesTransaction.fromJson(e)).toList();
+
+      final int totalPrice = int.tryParse(data['totalPrice']?.toString() ?? '0') ?? 0;
+
       LoggerService.info('[EXPENSES] Expenses fetched successfully.');
-      return ExpensesResponse.fromJson(response.data);
+      return ExpensesResponse(
+          expenses: expenses,
+          totalAmount: totalPrice,
+      );
     } catch (e, stackTrace) {
       LoggerService.error('[EXPENSES] Failed to fetch expenses.', error: e, stackTrace: stackTrace);
       throw Exception('Failed to fetch expenses: $e');

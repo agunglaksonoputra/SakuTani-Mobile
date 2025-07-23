@@ -32,20 +32,20 @@ class FinanceService {
     try {
       final res = await DioClient.dio.get('/user-balance');
       LoggerService.info('[FINANCE] Fetched user balances');
-      return res.data;
+      return res.data['data'];
     } catch (e) {
       LoggerService.error('[FINANCE] Failed to fetch user balances', error: e);
       throw Exception('Failed to fetch user balances: $e');
     }
   }
 
-  /// Get weekly breakdown (e.g., weekly income)
-  static Future<List<WeeklySummary>> getWeeklyBreakdown() async {
+  /// Get monnthly breakdown (e.g., monthly income)
+  static Future<List<MonthlySummary>> getMonthlyBreakdown() async {
     try {
-      final res = await DioClient.dio.get('/transactions/weekly-summary');
+      final res = await DioClient.dio.get('/report');
       final data = res.data['data'] as List;
       LoggerService.info('[FINANCE] Fetched weekly breakdown');
-      return data.map((item) => WeeklySummary.fromJson(item)).toList();
+      return data.map((item) => MonthlySummary.fromJson(item)).toList();
     } catch (e) {
       LoggerService.error('[FINANCE] Failed to fetch weekly breakdown', error: e);
       throw Exception("Failed to load weekly breakdown: $e");

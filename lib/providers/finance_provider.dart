@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:saku_tani_mobile/services/monthly_report_services.dart';
 import '../models/finance.dart';
 import '../services/finance_services.dart';
 import '../services/logger_service.dart';
@@ -7,13 +8,13 @@ import '../services/logger_service.dart';
 class FinanceProvider with ChangeNotifier {
   List<FinanceData> _financeCards = [];
   List<ProfitShareData> _profitShares = [];
-  List<WeeklySummary> _weeklyBreakdown = [];
+  List<MonthlySummary> _monthlyBreakdown = [];
   Map<String, List<Map<String, dynamic>>> _monthlyData = {};
   bool _isLoading = false;
 
   List<FinanceData> get financeCards => _financeCards;
   List<ProfitShareData> get profitShares => _profitShares;
-  List<WeeklySummary> get weeklyBreakdown => _weeklyBreakdown;
+  List<MonthlySummary> get monthlyBreekdown => _monthlyBreakdown;
   Map<String, List<Map<String, dynamic>>> get monthlyData => _monthlyData;
   bool get isLoading => _isLoading;
 
@@ -41,22 +42,17 @@ class FinanceProvider with ChangeNotifier {
 
       _financeCards = [
         FinanceData(
-          title: 'Total Balance',
-          amount: (data['total_user_balance'] ?? 0).toDouble(),
-          color: const Color(0xFF10B981),
-        ),
-        FinanceData(
-          title: 'Monthly Profit',
+          title: 'Laba',
           amount: (data['total_profit'] ?? 0).toDouble(),
           color: const Color(0xFF10B981),
         ),
         FinanceData(
-          title: 'Income',
+          title: 'Pendapatan',
           amount: (data['total_sales'] ?? 0).toDouble(),
           color: const Color(0xFF8B5CF6),
         ),
         FinanceData(
-          title: 'Expenses',
+          title: 'Pengeluaran',
           amount: (data['total_expenses'] ?? 0).toDouble(),
           color: const Color(0xFFF43F5E),
         ),
@@ -92,10 +88,10 @@ class FinanceProvider with ChangeNotifier {
   }
 
   /// Fetch weekly income & expenses breakdown
-  Future<void> fetchWeeklyBreakdown() async {
+  Future<void> fetchMonthlyBreakdown() async {
     try {
       LoggerService.info("[FINANCE] Fetching weekly breakdown...");
-      _weeklyBreakdown = await FinanceService.getWeeklyBreakdown();
+      _monthlyBreakdown = await FinanceService.getMonthlyBreakdown();
       LoggerService.info("[FINANCE] Weekly breakdown fetched.");
       notifyListeners();
     } catch (e) {
@@ -117,11 +113,11 @@ class FinanceProvider with ChangeNotifier {
   }
 
   /// Combine income & expense per week for charts
-  List<CashflowData> get cashflowData => _weeklyBreakdown.map((week) {
+  List<CashflowData> get cashflowData => _monthlyBreakdown.map((monthly) {
     return CashflowData(
-      income: week.totalSales,
-      expense: week.totalExpenses,
-      label: DateFormat('d MMM').format(DateTime.parse(week.weekEnd)),
+      income: monthly.totalSales,
+      expense: monthly.totalExpenses,
+      label: DateFormat('MMM').format(monthly.date),
     );
   }).toList();
 
@@ -136,7 +132,7 @@ class FinanceProvider with ChangeNotifier {
       await Future.wait([
         fetchFinanceSummary(),
         fetchProfitShares(),
-        fetchWeeklyBreakdown(),
+        fetchMonthlyBreakdown(),
       ]);
       LoggerService.info("[FINANCE] All data refreshed.");
     } catch (e) {

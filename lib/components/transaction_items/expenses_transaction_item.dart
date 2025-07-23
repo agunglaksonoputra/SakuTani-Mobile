@@ -5,11 +5,13 @@ import 'package:saku_tani_mobile/models/expenses_transaction.dart';
 class ExpensesTransactionItem extends StatelessWidget {
   final ExpensesTransaction transaction;
   final VoidCallback? onDelete;
+  final bool canDelete;
 
   const ExpensesTransactionItem({
     Key? key,
     required this.transaction,
     this.onDelete,
+    this.canDelete = false,
   }) : super(key: key);
 
   @override
@@ -44,7 +46,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                   child: Icon(
                     FontAwesomeIcons.cartShopping,
                     color: Colors.white,
-                    size: 20,
+                    size: 14,
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -55,7 +57,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                       Text(
                         transaction.name ?? 'Pelanggan',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.w600,
                           color: Color(0xFF1A1A1A),
                         ),
@@ -77,14 +79,14 @@ class ExpensesTransactionItem extends StatelessWidget {
                     Text(
                       '${transaction.formatCurrency(transaction.totalAmount)}',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                         color: Color(0xFF1A1A1A),
                       ),
                     ),
                   ],
                 ),
-                if (onDelete != null && _isDeleted(transaction.date)) ...[
+                if (canDelete && onDelete != null && _isDeleted(transaction.date)) ...[
                   SizedBox(width: 8),
                   InkWell(
                     onTap: () {
@@ -100,7 +102,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                       ),
                       child: Icon(
                         FontAwesomeIcons.trashCan,
-                        size: 16,
+                        size: 14,
                         color: Color(0xFFEF4444),
                       ),
                     ),
@@ -115,7 +117,7 @@ class ExpensesTransactionItem extends StatelessWidget {
                 children: [
                   Icon(
                     Icons.note_outlined,
-                    size: 16,
+                    size: 14,
                     color: Color(0xFF6B7280),
                   ),
                   SizedBox(width: 8),
@@ -144,15 +146,21 @@ class ExpensesTransactionItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Detail Transaksi'),
+        backgroundColor: Colors.white,
+        title: Text(
+          'Detail Transaksi',
+          style: TextStyle(
+            fontSize: 16
+          ),
+        ),
         // insetPadding: EdgeInsets.symmetric(horizontal: 24),
         content: SizedBox(
           width: 320,
           child: SingleChildScrollView(
             child: Table(
               columnWidths: const {
-                0: IntrinsicColumnWidth(),
-                1: FixedColumnWidth(2),
+                0: FlexColumnWidth(),
+                1: FixedColumnWidth(4),
                 2: FlexColumnWidth(),
               },
               children: [
@@ -186,16 +194,16 @@ class ExpensesTransactionItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Text(
             '$label',
-            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700]),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey[700]),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-          child: Text(':', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700])),
+          child: Text(':', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey[700])),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-          child: Text(value),
+          child: Text(value, style: TextStyle(fontSize: 12)),
         ),
       ],
     );

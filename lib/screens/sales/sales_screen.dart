@@ -5,6 +5,8 @@ import 'package:saku_tani_mobile/components/periode_selector.dart';
 import 'package:saku_tani_mobile/components/summary_cards.dart';
 import 'package:saku_tani_mobile/components/transaction_items/sales_transaction_item.dart';
 import 'package:saku_tani_mobile/screens/sales/sales_recording_screen.dart';
+import 'package:saku_tani_mobile/helper/role_permission_extension.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/sales_provider.dart';
 
 class SalesScreen extends StatefulWidget {
@@ -43,12 +45,14 @@ class _SalesScreenState extends State<SalesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60),
         child: AppBar(
           backgroundColor: Colors.white,
-          elevation: 1,
+          elevation: 0,
           automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Center(
@@ -69,7 +73,7 @@ class _SalesScreenState extends State<SalesScreen> {
                           'Penjualan',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 16,
                             color: Colors.black,
                           ),
                         ),
@@ -77,7 +81,8 @@ class _SalesScreenState extends State<SalesScreen> {
                     ),
 
                     // Action button (icon add)
-                    GestureDetector(
+                    (auth.role.canCreate)
+                      ? GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
@@ -90,8 +95,8 @@ class _SalesScreenState extends State<SalesScreen> {
                         });
                       },
                       child: Container(
-                        width: 40,
-                        height: 40,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: Color(0xFF10B981),
                           borderRadius: BorderRadius.circular(8),
@@ -99,10 +104,11 @@ class _SalesScreenState extends State<SalesScreen> {
                         child: Icon(
                           FontAwesomeIcons.plus,
                           color: Colors.white,
-                          size: 20,
+                          size: 14,
                         ),
                       ),
-                    ),
+                    ) : SizedBox.shrink(),
+
                   ],
                 ),
               ),
@@ -119,7 +125,7 @@ class _SalesScreenState extends State<SalesScreen> {
               return Center(child: CircularProgressIndicator());
             }
 
-            final data = provider.filteredTransactions;
+            final data = provider.transactions;
 
             return ListView(
               controller: _scrollController,
@@ -162,6 +168,7 @@ class _SalesScreenState extends State<SalesScreen> {
                   padding: const EdgeInsets.only(bottom: 12.0),
                   child: SalesTransactionItem(
                     transaction: transaction,
+                    canDelete: auth.role.canDelete,
                     onDelete: () {
                       _showDeleteDialog(context, transaction.id!);
                     },

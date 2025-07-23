@@ -6,6 +6,7 @@ import 'package:saku_tani_mobile/components/transaction_items/sales_transaction_
 import 'package:saku_tani_mobile/models/expenses_transaction.dart';
 import 'package:saku_tani_mobile/models/monthly_report_response.dart';
 import 'package:saku_tani_mobile/models/sale_transaction.dart';
+import '../../components/summary_cards.dart';
 import '../../models/transaction_record.dart';
 import '../../providers/monthly_report_provider.dart';
 
@@ -37,7 +38,7 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
         preferredSize: Size.fromHeight(60),
         child: AppBar(
           backgroundColor: Colors.white,
-          elevation: 1,
+          elevation: 0,
           automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Center(
@@ -54,7 +55,7 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
                       'Detail Laporan',
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                        fontSize: 16,
                         color: Colors.black,
                       ),
                     ),
@@ -78,6 +79,28 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
             return ListView(
               padding: EdgeInsets.all(16),
               children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: SummaryCard(
+                        title: 'Total Pendapatan',
+                        value: provider.formatCurrencyInt(provider.totalSales),
+                        color: Color(0xFF10B981),
+                        textColor: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: SummaryCard(
+                        title: 'Total Pengeluaran',
+                        value: provider.formatCurrencyInt(provider.totalExpenses),
+                        color: Color(0xFF8B5CF6),
+                        textColor: Colors.white,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
                 const Text(
                   'Daftar Transaksi',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

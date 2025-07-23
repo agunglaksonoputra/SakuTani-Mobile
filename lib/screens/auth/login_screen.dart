@@ -20,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final authProvider = Provider.of<AuthProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -35,13 +34,18 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Center(
-                          child: Image.asset(
-                            'assets/logo.png',
-                            width: 150, // Optional: atur ukuran gambar
-                            height: 150,
-                            fit: BoxFit.contain,
+                          child: Column(
+                            children: [
+                              Image.asset(
+                                'assets/logo.png',
+                                width: 150, // Optional: atur ukuran gambar
+                                height: 150,
+                                fit: BoxFit.contain,
+                              ),
+                            ],
                           ),
                         ),
+                        const SizedBox(height: 8),
                         Text(
                           'Username',
                           style: TextStyle(
@@ -181,6 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         ? const CircularProgressIndicator()
                         : SizedBox(
                       width: double.infinity,
+                      height: 56,
                       child: ElevatedButton(
                         onPressed: () async {
                           if (_formKey.currentState!.validate()) {

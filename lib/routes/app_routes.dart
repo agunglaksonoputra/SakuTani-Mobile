@@ -7,7 +7,7 @@ import 'package:saku_tani_mobile/screens/monthly_report/monthly_report_screen.da
 import 'package:saku_tani_mobile/screens/sales/sales_screen.dart';
 import 'package:saku_tani_mobile/screens/shares/shares_screen.dart';
 import 'package:saku_tani_mobile/screens/splash_screen.dart';
-import '../components/reports_screen.dart';
+import '../screens/reports_screen.dart';
 import '../screens/home_screen.dart';
 import '../screens/settings_screen.dart';
 import '../screens/shares/shares_recording_screen.dart';

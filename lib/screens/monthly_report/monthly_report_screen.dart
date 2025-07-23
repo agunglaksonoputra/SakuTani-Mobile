@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:saku_tani_mobile/components/monthly_report_item.dart';
+import 'package:saku_tani_mobile/components/summary_cards_report.dart';
 import 'package:saku_tani_mobile/providers/monthly_report_provider.dart';
+import '../../components/finance_card.dart';
 import '../../models/monthly_report_response.dart';
 
 class MonthlyReportScreen extends StatefulWidget {
@@ -19,7 +21,9 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<MonthlyReportProvider>(context, listen: false).fetchInitialData();
+      final provider = Provider.of<MonthlyReportProvider>(context, listen: false);
+      provider.fetchInitialData();
+      provider.fetchFinanceSummary();
     });
   }
 
@@ -30,7 +34,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
         preferredSize: Size.fromHeight(60),
         child: AppBar(
           backgroundColor: Colors.white,
-          elevation: 1,
+          elevation: 0,
           automaticallyImplyLeading: false,
           flexibleSpace: SafeArea(
             child: Center(
@@ -50,7 +54,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                           'Laporan Bulanan',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            fontSize: 20,
+                            fontSize: 16,
                             color: Colors.black,
                           ),
                         ),
@@ -61,8 +65,8 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                         Provider.of<MonthlyReportProvider>(context, listen: false).downloadExcelFile(context);
                       },
                       child: Container(
-                        width: 40,
-                        height: 40,
+                        width: 30,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: Color(0xFF8B5CF6),
                           borderRadius: BorderRadius.circular(8),
@@ -70,7 +74,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
                         child: Icon(
                           FontAwesomeIcons.download,
                           color: Colors.white,
-                          size: 20,
+                          size: 14,
                         ),
                       ),
                     ),
@@ -82,6 +86,7 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
         ),
       ),
       backgroundColor: Color(0xFFF5F7FA),
+      // backgroundColor: Colors.black,
       body: SafeArea(
         child: Consumer<MonthlyReportProvider> (
           builder: (context, provider, _) {
@@ -91,10 +96,39 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
 
             final data = provider.monthlyReports;
 
+            if (data.isEmpty) {
+              return Center(child: Text("Tidak ada data"));
+            }
+
+
             return ListView(
               // controller: _scrollController,
               padding: EdgeInsets.all(16),
               children: [
+                Column(
+                  children: provider.reportSummaryCards.length < 4
+                      ? [Center(child: CircularProgressIndicator())]
+                      : [
+                    Row(
+                      children: [
+                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[0])),
+                        const SizedBox(width: 12),
+                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[1])),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[2])),
+                        const SizedBox(width: 12),
+                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[3])),
+                      ],
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 22),
+
                 const Text(
                   'Daftar Laporan',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
@@ -145,5 +179,4 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
       ),
     );
   }
-
 }
