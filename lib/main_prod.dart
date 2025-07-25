@@ -18,10 +18,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await dotenv.load(fileName: ".env.prod");
   await initializeDateFormatting('id_ID', null);
-  runApp(const MainApp());
-
   await DioClient.initialize();
+  runApp(const MainApp());
 }
+
 
 class MainApp extends StatelessWidget {
   const MainApp({super.key});
