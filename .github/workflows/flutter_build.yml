@@ -12,22 +12,42 @@ jobs:
 
     steps:
       - name: ⬇️ Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: 💾 Install Flutter
         uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+          cache: true
 
       - name: 🔄 Install Dependencies
         run: flutter pub get
 
-      - name: 🛠️ Generate .env.prod file
-        run: echo "${{ secrets.ENV_PROD }}" > .env.prod
+      - name: 🛠️ Generate environment files
+        run: |
+          # Buat .env.prod (wajib)
+          echo "${{ secrets.ENV_PROD }}" > .env.prod
+          
+          echo "✅ .env.prod created"
+
+      - name: 🔍 Verify files
+        run: |
+          echo "Checking created files:"
+          ls -la .env.* 2>/dev/null || echo "No .env files found"
 
       - name: 📦 Build APK
-        run: flutter build apk --flavor prod -t lib/main_prod.dart
+        run: flutter build apk --flavor prod -t lib/main_prod.dart --release
 
       - name: 📦 Rename APK
-        run: mv build/app/outputs/flutter-apk/app-prod-release.apk build/app/outputs/flutter-apk/sakutani.apk
+        run: |
+          if [ -f "build/app/outputs/flutter-apk/app-prod-release.apk" ]; then
+            mv build/app/outputs/flutter-apk/app-prod-release.apk build/app/outputs/flutter-apk/sakutani.apk
+            echo "✅ APK renamed successfully"
+          else
+            echo "❌ APK file not found"
+            ls -la build/app/outputs/flutter-apk/
+            exit 1
+          fi
 
       - name: ⬆️ Upload APK Artifact
         uses: actions/upload-artifact@v4
