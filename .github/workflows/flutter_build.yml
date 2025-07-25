@@ -26,6 +26,9 @@ jobs:
       - name: 📦 Build APK
         run: flutter build apk --flavor prod -t lib/main_prod.dart
 
+      - name: 📦 Rename APK
+        run: mv build/app/outputs/flutter-apk/app-prod-release.apk build/app/outputs/flutter-apk/sakutani.apk
+
       - name: ⬆️ Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
