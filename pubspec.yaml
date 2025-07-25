@@ -36,4 +36,5 @@ flutter:
   assets:
     - .env.dev
     - .env.staging
+    - .env.prod
     - assets/logo.png
