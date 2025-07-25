@@ -21,7 +21,7 @@ jobs:
         run: flutter pub get
 
       - name: 🛠️ Generate .env.prod file
-        run: echo "${{ secrets.ENV_DEV }}" > .env.prod
+        run: echo "${{ secrets.ENV_PROD }}" > .env.prod
 
       - name: 📦 Build APK
         run: flutter build apk --flavor prod -t lib/main_prod.dart
