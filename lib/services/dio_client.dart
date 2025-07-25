@@ -11,16 +11,21 @@ final String baseUrl = (() {
   final device = dotenv.env['BASE_URL_DEVICE'];
   final test = dotenv.env['BASE_URL_TEST'];
   final production =  dotenv.env['BASE_URL'];
-  final selected = emulator ?? device ?? test ?? production ??  '';
-  return selected.endsWith('/') ? selected : '$selected/';
+  final selected = emulator ?? device ?? test ?? production ?? '';
+  final url = selected.endsWith('/') ? selected : '$selected/';
+
+  debugPrint('Base URL: $url');
+  return url;
 })();
+
 
 class DioClient {
   static final Dio _dio = Dio(
     BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 10),
-      receiveTimeout: const Duration(seconds: 10),
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+      sendTimeout: const Duration(seconds: 30),
       headers: {
         'Content-Type': 'application/json',
       },
