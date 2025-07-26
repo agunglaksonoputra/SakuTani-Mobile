@@ -61,14 +61,16 @@ jobs:
       - name: 📦 Build APK
         run: flutter build apk --flavor prod -t lib/main_prod.dart --release
 
+      - name: 🧾 Check APK output directory
+        run: ls -lh build/app/outputs/flutter-apk/
+
       - name: 📦 Rename APK
         run: |
           if [ -f "build/app/outputs/flutter-apk/app-prod-release.apk" ]; then
             mv build/app/outputs/flutter-apk/app-prod-release.apk build/app/outputs/flutter-apk/sakutani.apk
-            echo "✅ APK renamed successfully"
+            echo "✅ APK renamed to sakutani.apk"
           else
-            echo "❌ APK file not found"
-            ls -la build/app/outputs/flutter-apk/
+            echo "❌ APK file not found!"
             exit 1
           fi
 

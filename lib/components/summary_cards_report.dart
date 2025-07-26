@@ -27,6 +27,7 @@ class SummaryCardsReport extends StatelessWidget {
         ],
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
             width: 35,
@@ -41,8 +42,8 @@ class SummaryCardsReport extends StatelessWidget {
               size: 14,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
+          const SizedBox(width: 24),
+          Container(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

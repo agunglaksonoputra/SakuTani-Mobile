@@ -1,7 +1,7 @@
 name: saku_tani_mobile
 description: "SakuTani adalah aplikasi manajemen keuangan digital yang dirancang khusus untuk membantu petani dalam mencatat pemasukan dan pengeluaran hasil pertanian secara praktis, real-time, dan mudah digunakan."
 publish_to: 'none'
-version: 2.1.1+1
+version: 2.2.1+1
 
 environment:
   sdk: ^3.7.0

@@ -129,12 +129,11 @@ class _SharesScreenState extends State<SharesScreen> {
                   textColor: Colors.white,
                 ),
                 const SizedBox(height: 12),
-                Wrap(
-                  spacing: 12,
-                  runSpacing: 12,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: provider.otherUserBalances.map((user) {
-                    return SizedBox(
-                      width: (MediaQuery.of(context).size.width - 44) / 2,
+                    return Padding(
+                      padding: const EdgeInsets.only(bottom: 12),
                       child: SummaryCard(
                         title: user.name,
                         value: provider.formatCurrency(user.balance),
@@ -144,7 +143,7 @@ class _SharesScreenState extends State<SharesScreen> {
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: 12),
                 const Text(
                   'Pembayaran Bagi Hasil',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

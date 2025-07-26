@@ -107,24 +107,15 @@ class _MonthlyReportScreenState extends State<MonthlyReportScreen> {
               children: [
                 Column(
                   children: provider.reportSummaryCards.length < 4
-                      ? [Center(child: CircularProgressIndicator())]
-                      : [
-                    Row(
+                      ? [const Center(child: CircularProgressIndicator())]
+                      : provider.reportSummaryCards.map((data) {
+                    return Column(
                       children: [
-                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[0])),
-                        const SizedBox(width: 12),
-                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[1])),
+                        SummaryCardsReport(data: data),
+                        const SizedBox(height: 12),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[2])),
-                        const SizedBox(width: 12),
-                        Expanded(child: SummaryCardsReport(data: provider.reportSummaryCards[3])),
-                      ],
-                    ),
-                  ],
+                    );
+                  }).toList(),
                 ),
 
                 const SizedBox(height: 22),
