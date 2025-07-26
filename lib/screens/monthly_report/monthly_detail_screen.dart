@@ -79,9 +79,10 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
             return ListView(
               padding: EdgeInsets.all(16),
               children: [
-                Row(
+                Column(
                   children: [
-                    Expanded(
+                    Container(
+                      width: double.infinity,
                       child: SummaryCard(
                         title: 'Total Pendapatan',
                         value: provider.formatCurrencyInt(provider.totalSales),
@@ -89,8 +90,9 @@ class _MonthlyDetailScreenState extends State<MonthlyDetailScreen> {
                         textColor: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
+                    const SizedBox(height: 12),
+                    Container(
+                      width: double.infinity,
                       child: SummaryCard(
                         title: 'Total Pengeluaran',
                         value: provider.formatCurrencyInt(provider.totalExpenses),

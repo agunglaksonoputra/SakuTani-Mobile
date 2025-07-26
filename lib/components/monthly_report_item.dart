@@ -65,7 +65,7 @@ class MonthlyReportItem extends StatelessWidget {
                   Text(
                     monthlyReports.formattedDate,
                     style: TextStyle(
-                      fontSize: 14,
+                      fontSize: 12,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1A1A1A),
                     ),
@@ -80,14 +80,14 @@ class MonthlyReportItem extends StatelessWidget {
                 Text(
                   'Pendapatan',
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: 10,
                     color: Color(0xFF6B7280),
                   ),
                 ),
                 Text(
                   '${monthlyReports.formatCurrency(monthlyReports.totalSales)}',
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                     color: Color(0xFF1A1A1A),
                   ),

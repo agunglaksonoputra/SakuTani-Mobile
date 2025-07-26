@@ -33,7 +33,7 @@ class ProfitShareList extends StatelessWidget {
                       Text(
                         'Saldo Tersedia',
                         style: TextStyle(
-                          fontSize: 12.0,
+                          fontSize: 10.0,
                           color: Colors.grey.shade600,
                         ),
                       ),

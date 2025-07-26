@@ -137,9 +137,10 @@ class _SalesScreenState extends State<SalesScreen> {
                   onSelect: (range) => provider.setDateFilter(range),
                 ),
                 const SizedBox(height: 20),
-                Row(
+                Column(
                   children: [
-                    Expanded(
+                    Container(
+                      width: double.infinity,
                       child: SummaryCard(
                         title: 'Total Penjualan',
                         value: provider.formatCurrency(provider.summary.totalSales),
@@ -147,15 +148,18 @@ class _SalesScreenState extends State<SalesScreen> {
                         textColor: Colors.white,
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: SummaryCard(
+                    const SizedBox(height: 12),
+
+                    Container(
+                      width: double.infinity,
+                      child:  SummaryCard(
                         title: 'Total Berat',
                         value: '${provider.summary.totalWeight.toInt()} kg',
                         color: Color(0xFF8B5CF6),
                         textColor: Colors.white,
                       ),
                     ),
+
                   ],
                 ),
                 const SizedBox(height: 24),

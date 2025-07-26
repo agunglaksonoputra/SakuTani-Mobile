@@ -65,21 +65,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       Container(
                         width: double.infinity,
-                        child:  FinanceCard(data: provider.financeCards[0]),
+                        child: FinanceCard(data: provider.financeCards[0]),
                       ),
-
                       const SizedBox(height: 12),
-
-                      Row(
-                        children: [
-                          Expanded(
-                            child: FinanceCard(data: provider.financeCards[1]),
-                          ),
-                          const SizedBox(width: 12), // jarak antar kartu
-                          Expanded(
-                            child: FinanceCard(data: provider.financeCards[2]),
-                          ),
-                        ],
+                      Container(
+                        width: double.infinity,
+                        child: FinanceCard(data: provider.financeCards[1]),
+                      ),
+                      const SizedBox(height: 12),
+                      Container(
+                        width: double.infinity,
+                        child: FinanceCard(data: provider.financeCards[2]),
                       ),
                     ],
                   ),

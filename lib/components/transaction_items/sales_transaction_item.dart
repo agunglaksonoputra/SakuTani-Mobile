@@ -175,7 +175,12 @@ class SalesTransactionItem extends StatelessWidget {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        title: Text('Detail Transaksi'),
+        title: Text(
+          'Detail Transaksi',
+          style: TextStyle(
+              fontSize: 16
+          ),
+        ),
         // insetPadding: EdgeInsets.symmetric(horizontal: 24),
         content: SizedBox(
           width: 320,
@@ -218,16 +223,16 @@ class SalesTransactionItem extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 6),
           child: Text(
             '$label',
-            style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700]),
+            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey[700]),
           ),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 6),
-          child: Text(':', style: TextStyle(fontWeight: FontWeight.w600, color: Colors.grey[700])),
+          child: Text(':', style: TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: Colors.grey[700])),
         ),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-          child: Text(value),
+          child: Text(value, style: TextStyle(fontSize: 12)),
         ),
       ],
     );

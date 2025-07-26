@@ -90,14 +90,20 @@ class FinanceProvider with ChangeNotifier {
   /// Fetch weekly income & expenses breakdown
   Future<void> fetchMonthlyBreakdown() async {
     try {
-      LoggerService.info("[FINANCE] Fetching weekly breakdown...");
-      _monthlyBreakdown = await FinanceService.getMonthlyBreakdown();
-      LoggerService.info("[FINANCE] Weekly breakdown fetched.");
+      LoggerService.info("[FINANCE] Fetching monthly breakdown...");
+      final data = await FinanceService.getMonthlyBreakdown();
+
+      // Ambil hanya 6 data pertama (atau terakhir)
+      _monthlyBreakdown = data.take(6).toList(); // Untuk 6 data pertama
+      // _monthlyBreakdown = data.reversed.take(6).toList().reversed.toList(); // Untuk 6 data terakhir dengan urutan asli
+
+      LoggerService.info("[FINANCE] Monthly breakdown fetched.");
       notifyListeners();
     } catch (e) {
-      LoggerService.error("[FINANCE] Failed to fetch weekly breakdown.", error: e);
+      LoggerService.error("[FINANCE] Failed to fetch monthly breakdown.", error: e);
     }
   }
+
 
   /// Trigger monthly profit generation
   Future<void> generateCurrentMonthProfit() async {
